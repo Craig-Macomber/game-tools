@@ -1,0 +1,14 @@
+{
+  // "rust-analyzer.cargo.target": "wasm32-unknown-unknown",
+  "cSpell.words": [
+    "caith",
+    "dioxus",
+    "oninput",
+    "onsubmit",
+  ],
+  "files.readonlyInclude": {
+    "**/.cargo/registry/src/**/*.rs": true,
+    "**/lib/rustlib/src/rust/library/**/*.rs": true
+  },
+  "editor.formatOnSave": true
+}

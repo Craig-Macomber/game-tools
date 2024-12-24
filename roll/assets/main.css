@@ -1,0 +1,35 @@
+* {
+    box-sizing: border-box;
+}
+
+/* Create two equal columns that floats next to each other */
+.column {
+    float: left;
+    width: 50%;
+    padding: 10px;
+}
+
+/* Clear floats after the columns */
+.row:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+.bar {
+    display: flex;
+    justify-content: space_around;
+    background-color: #eee;
+    padding: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.bar-item {
+    flex-grow: 1;
+    padding: 0.5rem;
+}
+
+.message {
+    flex-grow: 1;
+    padding: 0.5rem;
+}
