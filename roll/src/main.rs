@@ -56,7 +56,9 @@ fn load_default() -> Option<String> {
 }
 
 #[cfg(not(target_arch = "wasm32"))]
-fn load_default() -> Option<String> {}
+fn load_default() -> Option<String> {
+    None
+}
 
 #[cfg(target_arch = "wasm32")]
 fn save_default(data: &str) {
@@ -68,4 +70,4 @@ fn save_default(data: &str) {
 }
 
 #[cfg(not(target_arch = "wasm32"))]
-fn save_default(data: &str) {}
+fn save_default(_data: &str) {}
