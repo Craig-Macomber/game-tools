@@ -13,17 +13,14 @@ pub(crate) fn Body() -> Element {
 
     let mut state = use_context::<Signal<State>>();
 
-    let mut filenames: Signal<Vec<String>> = use_signal(Vec::new);
-
     let lines = state.read().lines.clone();
-    let lines2 = state.read().lines.clone();
 
     rsx!(
         div {
             h1 { "Roller" }
             div { class: "bar",
                 span { class: "bar-item",
-                    button { onclick: move |_| { save_default(&lines2) }, "Save to URL" }
+                    button { onclick: move |_| { save_default(&state.read().lines.clone()) }, "Save to URL" }
                 }
                 span { class: "bar-item",
                     span { "Load File: " }
