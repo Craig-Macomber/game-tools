@@ -30,11 +30,13 @@ cd ..
 git branch -d pages
 git checkout -b pages
 
-cp -r ./target/dx/roll/release/web/public/* .
+git add -f ./target/dx/roll/release/web/public
 
-git add -f index.html
-git add -f assets
-git add -f wasm
+# cp -r ./target/dx/roll/release/web/public/* .
+
+# git add -f index.html
+# git add -f assets
+# git add -f wasm
 
 git commit -m "Web build for pages"
 git push -f --set-upstream origin pages
