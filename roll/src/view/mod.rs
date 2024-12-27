@@ -15,27 +15,15 @@ pub(crate) fn Body() -> Element {
 
     let mut filenames: Signal<Vec<String>> = use_signal(Vec::new);
 
-    let name = state.read().name.clone();
+    let lines = state.read().lines.clone();
+    let lines2 = state.read().lines.clone();
 
     rsx!(
         div {
             h1 { "Roller" }
             div { class: "bar",
                 span { class: "bar-item",
-                    span { "Name: " }
-                    input {
-                        // we tell the component what to render
-                        value: "{name}",
-                        // and what to do when the value changes
-                        oninput: {
-                            move |event: Event<FormData>| {
-                                state.write().borrow_mut().name = event.value();
-                            }
-                        },
-                    }
-                }
-                span { class: "bar-item",
-                    button { onclick: move |_| { save_default(&name) }, "Save to URL" }
+                    button { onclick: move |_| { save_default(&lines2) }, "Save to URL" }
                 }
                 span { class: "bar-item",
                     span { "Load Data: " }
@@ -59,12 +47,25 @@ pub(crate) fn Body() -> Element {
                 }
             }
             div { class: "row",
-                div {
-                    class: "column",
-                    style: "background-color:#aaa;height:500px;",
+                div { class: "column",
+                    h2 { style: "flex: 0;", "Edit:" }
+                    textarea {
+                        style: "flex-grow: 1;",
+                        value: "{lines}",
+                        oninput: {
+                            move |event: Event<FormData>| {
+                                state.write().borrow_mut().lines = event.value();
+                            }
+                        },
+                    }
+                }
+                div { class: "column", style: "background-color:#aaa;",
+                    h2 { "Roll:" }
+                    for line in lines.lines() {
+                        roll::ConstantRoll { spec: line }
+                    }
                 }
                 div { class: "column",
-                    roll::Roll {}
                     h2 { "Log:" }
                     ul {
                         for message in log.read().borrow().log.iter().rev() {

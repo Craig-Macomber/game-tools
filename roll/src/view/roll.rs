@@ -54,3 +54,36 @@ pub(crate) fn view_roll(roller: &Result<Roller, RollError>) -> String {
         Err(d) => format!("Parse Error: {d}"),
     }
 }
+
+#[component]
+pub(crate) fn ConstantRoll(spec: String) -> Element {
+    let mut log = use_context::<Signal<Log>>();
+
+    let roller = Roller::new(&spec).unwrap();
+    let roller2 = Roller::new(&spec).unwrap();
+    let roll = roller.roll();
+    let roll_view = view_roll(&Ok(roller));
+
+    match roll {
+        Ok(_) => {
+            rsx!(
+                form {
+                    style: "display: flex;",
+                    onsubmit: {
+                        move |event| {
+                            log::info!("Rolled! {event:?}");
+                            let d = roller2.roll().unwrap();
+                            let msg = format!("{roll_view}: {}", d);
+                            log.write().log.push(msg);
+                        }
+                    },
+                    span { "{spec} --> {roll_view}" }
+                    input { r#type: "submit", value: "Roll" }
+                }
+            )
+        }
+        Err(d) => rsx!(
+            span { title: "{d}", "{spec}" }
+        ),
+    }
+}
