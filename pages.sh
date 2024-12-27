@@ -29,7 +29,7 @@ git branch -d pages
 git checkout -b pages
 
 # Path set by out_path in roll/Dioxus.toml does not work, so move the build manually:
-mv ./target/dx/roll/release/web/public ./docs
+cp -r ./target/dx/roll/release/web/public/* ./docs
 
 git add -f ./docs
 
