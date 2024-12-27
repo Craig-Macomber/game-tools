@@ -26,20 +26,22 @@ pub(crate) fn Body() -> Element {
                     button { onclick: move |_| { save_default(&lines2) }, "Save to URL" }
                 }
                 span { class: "bar-item",
-                    span { "Load Data: " }
+                    span { "Load File: " }
                     input {
-                        // tell the input to pick a file
                         r#type: "file",
-                        directory: true,
-                        // list the accepted extensions
-                        // accept: ".txt,.rs",
-                        // pick multiple files
-                        // multiple: true,
+                        directory: false,
+                        accept: ".txt",
+                        multiple: false,
                         onchange: move |evt| {
-                            if let Some(file_engine) = &evt.files() {
-                                let files = file_engine.files();
-                                for file_name in files {
-                                    filenames.write().push(file_name);
+                            async move {
+                                if let Some(file_engine) = evt.files() {
+                                    let files = file_engine.files();
+                                    for file_name in &files {
+                                        if let Some(file) = file_engine.read_file_to_string(file_name).await
+                                        {
+                                            state.write().borrow_mut().lines = file;
+                                        }
+                                    }
                                 }
                             }
                         },
