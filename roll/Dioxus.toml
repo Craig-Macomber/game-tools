@@ -3,10 +3,17 @@
 # App (Project) Name
 name = "Roller"
 
+# Set the out_dir as documented in https://dioxuslabs.com/learn/0.6/cookbook/publishing
+# This does not work, nor does passing --outdir to "dx bundle".
+# out_dir = "docs"
+
 [web.app]
 
 # HTML title tag content
 title = "Roller"
+
+# This is needed if not using custom domain:
+# base_path = "game-tools"
 
 # include `assets` in web platform
 [web.resource]

@@ -22,21 +22,16 @@ cargo test
 # wasm-pack build --target web
 
 # Build for web
-cd ./roll
-dx bundle --platform web
-cd ..
+dx bundle --package roll --platform web
 
 # Regenerate the pages branch from the current one
 git branch -d pages
 git checkout -b pages
 
-git add -f ./target/dx/roll/release/web/public
+# Path set by out_path in roll/Dioxus.toml does not work, so move the build manually:
+mv ./target/dx/roll/release/web/public ./docs
 
-# cp -r ./target/dx/roll/release/web/public/* .
-
-# git add -f index.html
-# git add -f assets
-# git add -f wasm
+git add -f ./docs
 
 git commit -m "Web build for pages"
 git push -f --set-upstream origin pages
