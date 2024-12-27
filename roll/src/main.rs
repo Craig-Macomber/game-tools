@@ -1,13 +1,11 @@
-use serde::{Deserialize, Serialize};
-
 mod view;
 
-#[derive(Serialize, Deserialize, Debug, Default, Clone)]
+#[derive(Debug, Default, Clone)]
 struct State {
     lines: String,
 }
 
-#[derive(Serialize, Deserialize, Debug, Default, Clone)]
+#[derive(Debug, Default, Clone)]
 struct Log {
     log: Vec<String>,
 }
@@ -23,9 +21,11 @@ fn main() {
 
 #[component]
 fn App() -> Element {
+    let default_test = "";
+
     use_context_provider(|| {
         Signal::new(State {
-            lines: load_default().unwrap_or("".to_owned()),
+            lines: load_default().unwrap_or(default_test.to_owned()),
         })
     });
     rsx! {
