@@ -6,17 +6,18 @@
   <meta content="text/html;charset=utf-8" http-equiv="Content-Type" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta charset="UTF-8" />
-  <link rel="preload" href="./pages/wasm/roll_bg.wasm" as="fetch" type="application/wasm" crossorigin="">
-  <link rel="preload" href="./pages/wasm/roll.js" as="script">
+  <link rel="preload" href="./target/dx/roll/release/web/public/wasm/roll_bg.wasm" as="fetch" type="application/wasm"
+    crossorigin="">
+  <link rel="preload" href="./target/dx/roll/release/web/public/wasm/roll.js" as="script">
 </head>
 
 <body>
   <div id="main"></div>
   <script>
     // We can't use a module script here because we need to start the script immediately when streaming
-    import("./pages/wasm/roll.js").then(
+    import("./target/dx/roll/release/web/public/wasm/roll.js").then(
       ({ default: init }) => {
-        init("./pages/wasm/roll_bg.wasm").then((wasm) => {
+        init("./target/dx/roll/release/web/public/wasm/roll_bg.wasm").then((wasm) => {
           if (wasm.__wbindgen_start == undefined) {
             wasm.main();
           }

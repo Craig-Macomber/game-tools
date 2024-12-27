@@ -22,13 +22,15 @@ cargo test
 # wasm-pack build --target web
 
 # Build for web
-dx bundle --package roll --platform web --outdir pages
+cd ./roll
+dx bundle --platform web
+cd ..
 
 # Regenerate the pages branch from the current one
 git branch -d pages
 git checkout -b pages
 
-git add -f ./pages
+git add -f ./target/dx/roll/release/web/public
 
 # cp -r ./target/dx/roll/release/web/public/* .
 
