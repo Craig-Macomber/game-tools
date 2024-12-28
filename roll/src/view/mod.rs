@@ -15,8 +15,6 @@ pub(crate) fn Body() -> Element {
 
     let lines = state.read().lines.clone();
 
-    let storage = load_storage();
-
     rsx!(
         div { class: "container",
             h1 { "Roller" }
