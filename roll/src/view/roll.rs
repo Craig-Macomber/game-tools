@@ -25,8 +25,7 @@ pub(crate) fn ConstantRoll(spec: String) -> Element {
                     button {
                         onclick: move |_| {
                             let roll = roller.roll().unwrap();
-                            // let message = roll.to_string();
-                            if let Some(single) = roll.as_single()  {
+                            if let Some(single) = roll.as_single() {
                                 let message = single.to_string(false);
                                 let msg = format!("{spec}: {message}");
                                 log.write().log.push(msg);
@@ -37,7 +36,6 @@ pub(crate) fn ConstantRoll(spec: String) -> Element {
                                     let msg = format!("\u{00a0}\u{00a0}\u{00a0}\u{00a0}{message}");
                                     log.write().log.push(msg);
                                 }
-
                                 let total = roll.get_total().map_or("".to_owned(), |x| x.to_string());
                                 log.write().log.push(format!("{spec}: {total}"));
                             }
@@ -52,6 +50,7 @@ pub(crate) fn ConstantRoll(spec: String) -> Element {
         ),
     }
 }
+
 mod tests {
     use caith::Roller;
     #[test]
