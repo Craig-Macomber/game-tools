@@ -21,22 +21,9 @@ fn main() {
 
 #[component]
 fn App() -> Element {
-    let default_test = "Examples:
-1d20
-2d6 + 1d4 + 5
-
-Advantage:
-2d20 K1
-
-Disadvantage:
-2d20 k1
-
-Repeated rolls:
-(2d6 + 6) ^+ 8";
-
     use_context_provider(|| {
         Signal::new(State {
-            lines: load_default().unwrap_or(default_test.to_owned()),
+            lines: load_default(),
         })
     });
     rsx! {
@@ -49,7 +36,7 @@ Repeated rolls:
 }
 
 #[cfg(target_arch = "wasm32")]
-fn load_default() -> Option<String> {
+fn load_url() -> Option<String> {
     let window = web_sys::window().unwrap();
     let document = window.document().unwrap();
     let location = document.location().unwrap();
@@ -68,13 +55,34 @@ fn load_default() -> Option<String> {
     }
 }
 
-#[cfg(not(target_arch = "wasm32"))]
-fn load_default() -> Option<String> {
-    None
+fn load_default() -> String {
+    #[cfg(not(target_arch = "wasm32"))]
+    {
+        return DEFAULT_TEXT.to_owned();
+    }
+
+    #[cfg(target_arch = "wasm32")]
+    {
+        return load_url()
+            .unwrap_or_else(|| load_storage().unwrap_or_else(|| DEFAULT_TEXT.to_owned()));
+    }
 }
 
+static DEFAULT_TEXT: &'static str = "Examples:
+1d20
+2d6 + 1d4 + 5
+
+Advantage:
+2d20 K1
+
+Disadvantage:
+2d20 k1
+
+Repeated rolls:
+(2d6 + 6) ^+ 8";
+
 #[cfg(target_arch = "wasm32")]
-fn save_default(data: &str) {
+fn save_url(data: &str) {
     let window = web_sys::window().unwrap();
     let document = window.document().unwrap();
     let location = document.location().unwrap();
@@ -82,5 +90,27 @@ fn save_default(data: &str) {
     location.set_hash(&encoded).unwrap();
 }
 
+static STORAGE_KEY: &'static str = "roller: text";
+
+#[cfg(target_arch = "wasm32")]
+fn save_storage(data: Option<&str>) {
+    let window = web_sys::window().unwrap();
+    let storage = window.local_storage().unwrap().unwrap();
+    match data {
+        Some(data) => storage.set_item(STORAGE_KEY, data).unwrap(),
+        None => storage.remove_item(STORAGE_KEY).unwrap(),
+    }
+}
+
+#[cfg(target_arch = "wasm32")]
+fn load_storage() -> Option<String> {
+    let window = web_sys::window()?;
+    let storage = window.local_storage().unwrap_or(None)?;
+    storage.get_item(STORAGE_KEY).unwrap_or(None)
+}
+
 #[cfg(not(target_arch = "wasm32"))]
-fn save_default(_data: &str) {}
+fn save_url(_data: &str) {}
+
+#[cfg(not(target_arch = "wasm32"))]
+fn save_storage(_data: &str) {}

@@ -1,4 +1,4 @@
-use crate::save_default;
+use crate::{load_storage, save_storage, save_url};
 use crate::{Log, State};
 
 use dioxus::prelude::*;
@@ -15,14 +15,38 @@ pub(crate) fn Body() -> Element {
 
     let lines = state.read().lines.clone();
 
+    let storage = load_storage();
+
     rsx!(
         div { class: "container",
             h1 { "Roller" }
             div { class: "bar",
                 span { class: "bar-item",
-                    button { onclick: move |_| { save_default(&state.read().lines.clone()) },
-                        "Save to URL"
+                    button { onclick: move |_| { save_url(&state.read().lines) }, "Save to URL" }
+                }
+                span { class: "bar-item",
+                    "Local Storage:"
+                    button { onclick: move |_| { save_storage(Some(&state.read().lines)) },
+                        "Save"
                     }
+                    button {
+                        onclick: move |_| {
+                            let storage = load_storage();
+                            match storage {
+                                Some(data) => {
+                                    state.write().borrow_mut().lines = data;
+                                }
+                                None => {
+                                    web_sys::window()
+                                        .unwrap()
+                                        .alert_with_message("No data in local storage to load.")
+                                        .unwrap();
+                                }
+                            }
+                        },
+                        "Load"
+                    }
+                    button { onclick: |_| { save_storage(None) }, "Clear" }
                 }
                 span { class: "bar-item",
                     span { "Load File: " }
