@@ -86,6 +86,9 @@ pub(crate) fn Body() -> Element {
             span { class: "bar-item",
                 a { href: "/license.html", "Open source usage attributions" }
             }
+            span { class: "bar-item",
+                a { href: "/known-issues.html", "Known issues" }
+            }
         }
     )
 }
