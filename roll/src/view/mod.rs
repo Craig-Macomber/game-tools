@@ -20,7 +20,9 @@ pub(crate) fn Body() -> Element {
             h1 { "Roller" }
             div { class: "bar",
                 span { class: "bar-item",
-                    button { onclick: move |_| { save_default(&state.read().lines.clone()) }, "Save to URL" }
+                    button { onclick: move |_| { save_default(&state.read().lines.clone()) },
+                        "Save to URL"
+                    }
                 }
                 span { class: "bar-item",
                     span { "Load File: " }
@@ -48,6 +50,9 @@ pub(crate) fn Body() -> Element {
             div { class: "row",
                 div { class: "column",
                     h2 { style: "flex: 0;", "Edit:" }
+                    a { href: "https://github.com/Geobert/caith?tab=readme-ov-file#syntax",
+                        "Syntax"
+                    }
                     textarea {
                         style: "flex-grow: 1;",
                         value: "{lines}",

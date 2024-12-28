@@ -21,7 +21,18 @@ fn main() {
 
 #[component]
 fn App() -> Element {
-    let default_test = "";
+    let default_test = "Examples:
+1d20
+2d6 + 1d4 + 5
+
+Advantage:
+2d20 K1
+
+Disadvantage:
+2d20 k1
+
+Repeated rolls:
+(2d6 + 6) ^+ 8";
 
     use_context_provider(|| {
         Signal::new(State {
