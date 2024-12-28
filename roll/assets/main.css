@@ -12,8 +12,9 @@
     width: 33.33%;
     padding: 10px;
     flex-direction: column;
-    height: 1000px;
+    flex-grow: 1;
     display: flex;
+    min-height: 400px;
 }
 
 /* Clear floats after the columns */
@@ -39,4 +40,9 @@
 .message {
     flex-grow: 1;
     padding: 0.5rem;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
 }
