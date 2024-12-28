@@ -74,5 +74,13 @@ pub(crate) fn Body() -> Element {
                 }
             }
         }
+        div { class: "bar",
+            span { class: "bar-item",
+                a { href: "https://github.com/Craig-Macomber/game-tools", "Source code" }
+            }
+            span { class: "bar-item",
+                a { href: "/license.html", "Open source usage attributions" }
+            }
+        }
     )
 }

@@ -31,6 +31,8 @@ git checkout -b pages
 # Path set by out_path in roll/Dioxus.toml does not work, so move the build manually:
 cp -r ./target/dx/roll/release/web/public/* ./docs
 
+cargo about generate about.hbs > docs/license.html
+
 git add -f ./docs
 
 git commit -m "Web build for pages"
