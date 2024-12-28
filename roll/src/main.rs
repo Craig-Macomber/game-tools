@@ -111,6 +111,3 @@ fn load_storage() -> Option<String> {
 
 #[cfg(not(target_arch = "wasm32"))]
 fn save_url(_data: &str) {}
-
-#[cfg(not(target_arch = "wasm32"))]
-fn save_storage(_data: &str) {}

@@ -1,4 +1,3 @@
-use crate::{load_storage, save_storage, save_url};
 use crate::{Log, State};
 
 use dioxus::prelude::*;
@@ -9,6 +8,8 @@ mod roll;
 
 #[component]
 pub(crate) fn Body() -> Element {
+    use crate::save_url;
+
     let log = use_context_provider(|| Signal::new(Log::default()));
 
     let mut state = use_context::<Signal<State>>();
@@ -22,30 +23,7 @@ pub(crate) fn Body() -> Element {
                 span { class: "bar-item",
                     button { onclick: move |_| { save_url(&state.read().lines) }, "Save to URL" }
                 }
-                span { class: "bar-item",
-                    "Local Storage:"
-                    button { onclick: move |_| { save_storage(Some(&state.read().lines)) },
-                        "Save"
-                    }
-                    button {
-                        onclick: move |_| {
-                            let storage = load_storage();
-                            match storage {
-                                Some(data) => {
-                                    state.write().borrow_mut().lines = data;
-                                }
-                                None => {
-                                    web_sys::window()
-                                        .unwrap()
-                                        .alert_with_message("No data in local storage to load.")
-                                        .unwrap();
-                                }
-                            }
-                        },
-                        "Load"
-                    }
-                    button { onclick: |_| { save_storage(None) }, "Clear" }
-                }
+                Storage {}
                 span { class: "bar-item",
                     span { "Load File: " }
                     input {
@@ -112,5 +90,47 @@ pub(crate) fn Body() -> Element {
                 a { href: "/known-issues.html", "Known issues" }
             }
         }
+    )
+}
+
+#[component]
+#[cfg(target_arch = "wasm32")]
+fn Storage() -> Element {
+    use crate::{load_storage, save_storage, save_url};
+
+    let mut state = use_context::<Signal<State>>();
+    let lines = state.read().lines.clone();
+
+    rsx!(
+        span { class: "bar-item",
+            "Local Storage:"
+            button { onclick: move |_| { save_storage(Some(&state.read().lines)) }, "Save" }
+            button {
+                onclick: move |_| {
+                    let storage = load_storage();
+                    match storage {
+                        Some(data) => {
+                            state.write().borrow_mut().lines = data;
+                        }
+                        None => {
+                            web_sys::window()
+                                .unwrap()
+                                .alert_with_message("No data in local storage to load.")
+                                .unwrap();
+                        }
+                    }
+                },
+                "Load"
+            }
+            button { onclick: |_| { save_storage(None) }, "Clear" }
+        }
+    )
+}
+
+#[component]
+#[cfg(not(target_arch = "wasm32"))]
+fn Storage() -> Element {
+    rsx!(
+        span { class: "bar-item", "Local storage not supported" }
     )
 }
