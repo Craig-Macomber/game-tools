@@ -89,6 +89,9 @@ pub(crate) fn Body() -> Element {
             span { class: "bar-item",
                 a { href: "/known-issues.html", "Known issues" }
             }
+            span { class: "bar-item",
+                a { href: "/data.html", "Data" }
+            }
         }
     )
 }
