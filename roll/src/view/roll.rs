@@ -1,5 +1,6 @@
 use caith::Roller;
 use dioxus::prelude::*;
+use dioxus_markdown::Markdown;
 
 use crate::Log;
 
@@ -18,6 +19,7 @@ pub(crate) fn ConstantRoll(spec: String) -> Element {
     // Rolled only to see if there is an error.
     let dummy_roll = roller.roll();
 
+    // Empty line case
     if spec.is_empty() {
         return rsx!(
             // Non-breaking 0 width space so span takes up a line
@@ -33,18 +35,18 @@ pub(crate) fn ConstantRoll(spec: String) -> Element {
                         onclick: move |_| {
                             let roll = roller.roll().unwrap();
                             if let Some(single) = roll.as_single() {
-                                let message = single.to_string(false);
+                                let message = single.to_string(true);
                                 let msg = format!("{spec}: {message}");
                                 log.write().log.push(msg);
                             } else {
                                 let roll = roll.as_repeated().unwrap();
                                 for single in roll.deref() {
-                                    let message = single.to_string(false);
+                                    let message = single.to_string(true);
                                     let msg = format!("\u{00a0}\u{00a0}\u{00a0}\u{00a0}{message}");
                                     log.write().log.push(msg);
                                 }
                                 let total = roll.get_total().map_or("".to_owned(), |x| x.to_string());
-                                log.write().log.push(format!("{spec}: {total}"));
+                                log.write().log.push(format!("{spec}: **{total}**"));
                             }
                         },
                         "{spec}"
@@ -53,7 +55,10 @@ pub(crate) fn ConstantRoll(spec: String) -> Element {
             )
         }
         Err(d) => rsx!(
-            span { title: "{d}", "{spec}" }
+            // Not a valid roll, so display as Markdown, but include error from Roller as hover text incase it was intended to be a roll button.
+            span { title: "{d}",
+                Markdown { src: "{spec}" }
+            }
         ),
     }
 }
