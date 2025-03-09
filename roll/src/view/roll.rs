@@ -74,12 +74,10 @@ mod tests {
 
         let result = roller.roll().unwrap();
         let numeric = result.as_single().unwrap();
-        let history = numeric.to_string_history();
         let as_string = numeric.to_string(false);
 
         assert_eq!(numeric.get_total(), 1);
         assert_eq!(as_string, "[1] = 1");
-        assert_eq!(history, "[1]");
     }
 
     #[test]
@@ -89,13 +87,10 @@ mod tests {
 
         let result = roller.roll().unwrap();
         let numeric = result.as_single().unwrap();
-        let history = numeric.to_string_history();
         let as_string = numeric.to_string(false);
 
         assert_eq!(numeric.get_total(), 1);
-        assert_eq!(as_string, "[1] = 1");
-        // Rerolls are currently not displayed in the history
-        assert_eq!(history, "[1]");
+        assert_eq!(as_string, "[1 -> 1] -> [1] = 1");
     }
 
     #[test]
@@ -105,11 +100,9 @@ mod tests {
 
         let result = roller.roll().unwrap();
         let numeric = result.as_single().unwrap();
-        let history = numeric.to_string_history();
         let as_string = numeric.to_string(false);
 
         assert_eq!(numeric.get_total(), 1);
         assert_eq!(as_string, "[1] = 1");
-        assert_eq!(history, "[1]");
     }
 }
