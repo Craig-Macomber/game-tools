@@ -349,8 +349,7 @@ dependencies = [
 [[package]]
 name = "caith"
 version = "4.2.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "860de926a9e6359e89437399be10522b1b8411d7ebf72cb79a8f69dd9f46a6bf"
+source = "git+https://github.com/Craig-Macomber/caith?branch=cleanup#3d2b9390e0533b5c7b78a24491ec506825ae5b18"
 dependencies = [
  "pest",
  "pest_derive",

@@ -9,7 +9,8 @@ license = "MIT"
 
 [dependencies]
 dioxus = { version = "0.6.0", features = [] }
-caith = "4.2.3"
+# Has a fix for https://github.com/Geobert/caith/issues/5
+caith = { git = "https://github.com/Craig-Macomber/caith", branch = "cleanup" }
 dioxus-markdown = { git = "https://github.com/Craig-Macomber/rust-web-markdown", rev = "809fbb99f52c219a60bac5345e2f3e271abc41f8" }
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
