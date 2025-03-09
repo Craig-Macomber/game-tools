@@ -349,7 +349,7 @@ dependencies = [
 [[package]]
 name = "caith"
 version = "4.2.3"
-source = "git+https://github.com/Craig-Macomber/caith?branch=cleanup#3d2b9390e0533b5c7b78a24491ec506825ae5b18"
+source = "git+https://github.com/Craig-Macomber/caith?branch=cleanup#e2dd1d8e68cbf3478ac61daf961732babbd8be6f"
 dependencies = [
  "pest",
  "pest_derive",
