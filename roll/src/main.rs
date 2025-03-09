@@ -81,7 +81,7 @@ static DEFAULT_TEXT: &'static str = "## Examples:
 ## Repeated rolls:
 (2d6 + 6) ^+ 8
 
-## Reroll ones:
+## Re-roll ones:
 8d6 r1";
 
 #[cfg(target_arch = "wasm32")]
