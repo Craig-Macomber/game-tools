@@ -8,7 +8,7 @@ license = "MIT"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-dioxus = { version = "0.6.0", features = [] }
+dioxus = { version = "0.6.3", features = [] }
 # Has a fix for https://github.com/Geobert/caith/issues/5
 caith = { git = "https://github.com/Craig-Macomber/caith", branch = "cleanup" }
 dioxus-markdown = { git = "https://github.com/Craig-Macomber/rust-web-markdown", rev = "809fbb99f52c219a60bac5345e2f3e271abc41f8" }
