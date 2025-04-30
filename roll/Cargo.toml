@@ -15,7 +15,7 @@ dioxus-markdown = { git = "https://github.com/Craig-Macomber/rust-web-markdown",
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 # caith pulls in "getrandom" which needs custom features to support WASM:
-getrandom = { version = "0.2.15", features = ["js"] }
+getrandom = { version = "0.3.2", features = ["wasm_js"] }
 web-sys = { version = "0.3.76", features = ['Document', "Location", "Storage"] }
 js-sys = { version = "0.3.76" }
 
