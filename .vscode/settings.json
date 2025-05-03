@@ -2,9 +2,10 @@
   // "rust-analyzer.cargo.target": "wasm32-unknown-unknown",
   "cSpell.words": [
     "caith",
+    "chrono",
     "dioxus",
     "oninput",
-    "onsubmit",
+    "onsubmit"
   ],
   "files.readonlyInclude": {
     "**/.cargo/registry/src/**/*.rs": true,

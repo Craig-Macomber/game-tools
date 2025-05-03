@@ -1,10 +1,12 @@
-use chrono::{DateTime, Local, TimeDelta};
-use dioxus::{logger::tracing, prelude::*};
+use chrono::{DateTime, Local};
+use dioxus::prelude::*;
 use dioxus_markdown::Markdown;
 
 use crate::LogItem;
 
 use std::{future::Future, vec};
+
+use super::time_observer::TimeObserver;
 
 /**
  * Display log item.
@@ -57,65 +59,12 @@ fn display_relative_time_inner(time: chrono::DateTime<Local>, now: &mut TimeObse
     format!("{time_string} ({ago_string})")
 }
 
-pub struct TimeObserver {
-    now: DateTime<Local>,
-    /// When something observed about `now` would change (relative to now)
-    wake: Option<TimeDelta>,
-}
-
-impl TimeObserver {
-    pub fn in_future(&mut self, t: DateTime<Local>) -> bool {
-        let delta = t - self.now;
-        if delta > TimeDelta::zero() {
-            self.wake(delta);
-            true
-        } else {
-            false
-        }
-    }
-
-    pub fn hours_after_now(&mut self, t: DateTime<Local>) -> i64 {
-        let delta = t - self.now;
-        let hours = delta.num_hours();
-        let wake = delta - TimeDelta::hours(if hours > 0 { hours } else { hours - 1 });
-        self.wake(wake);
-        hours
-    }
-
-    pub fn minutes_after_now(&mut self, t: DateTime<Local>) -> i64 {
-        let delta = t - self.now;
-        let minutes = delta.num_minutes();
-        let wake = delta - TimeDelta::minutes(if minutes > 0 { minutes } else { minutes - 1 });
-        self.wake(wake);
-        minutes
-    }
-
-    pub fn seconds_after_now(&mut self, t: DateTime<Local>) -> i64 {
-        let delta = t - self.now;
-        let seconds = delta.num_seconds();
-        let wake = delta - TimeDelta::seconds(if seconds > 0 { seconds } else { seconds - 1 });
-        self.wake(wake);
-        seconds
-    }
-
-    fn wake(&mut self, d: TimeDelta) {
-        if let Some(old) = self.wake {
-            if old < d {
-                return;
-            }
-        }
-        self.wake = Some(d);
-    }
-}
-
+/// Provide a callback access to the current time,
+/// and schedule an dioxus update for when what was observed about the time will change.
 fn observe_time<T, F: FnOnce(&mut TimeObserver) -> T>(f: F) -> T {
-    let mut observer = TimeObserver {
-        now: Local::now(),
-        wake: None,
-    };
+    let mut observer = TimeObserver::new(Local::now());
     let result = f(&mut observer);
-    if let Some(wake) = observer.wake {
-        let deadline = observer.now + wake;
+    if let Some(deadline) = observer.into_deadline() {
         let update = schedule_update();
         spawn(async move {
             sleep_until(deadline).await;
@@ -131,13 +80,13 @@ fn sleep_until(deadline: DateTime<Local>) -> impl Future<Output = ()> {
     // This does not account for if the local clock is changed since desired delay is in local time not monotonic time, but sleep is in monotonic time.
     // TODO: this could be made better by detecting clock changes somehow (or just waking periodically) and restarting the sleep afterwards with newly computed delta.
     let duration = deadline - Local::now();
-    let seconds = duration.as_seconds_f32();
-    async_std::task::sleep(std::time::Duration::from_secs_f32(f32::max(0f32, seconds)))
+    let seconds = f32::max(0f32, duration.as_seconds_f32());
+    async_std::task::sleep(std::time::Duration::from_secs_f32(seconds))
 }
 
 #[cfg(test)]
 mod tests {
-    use chrono::{Local, TimeDelta, TimeZone};
+    use chrono::{Local, TimeZone};
 
     use super::*;
 
@@ -145,37 +94,7 @@ mod tests {
     fn display_time() {
         let t = Local.with_ymd_and_hms(2014, 7, 8, 9, 10, 11).unwrap();
         let now = Local.with_ymd_and_hms(2014, 7, 8, 9, 15, 11).unwrap();
-        let s = display_relative_time_inner(t, &mut TimeObserver { now, wake: None });
+        let s = display_relative_time_inner(t, &mut TimeObserver::new(now));
         assert_eq!(s, "09:10:11 (5 minutes ago)");
-    }
-
-    #[test]
-    fn observe_time() {
-        let mut observer = TimeObserver {
-            now: Local.with_ymd_and_hms(2014, 7, 8, 9, 10, 11).unwrap(),
-            wake: None,
-        };
-
-        assert_eq!(
-            observer.in_future(Local.with_ymd_and_hms(2014, 7, 8, 9, 10, 10).unwrap()),
-            false
-        );
-
-        assert!(observer.wake.is_none());
-
-        assert_eq!(
-            observer.in_future(Local.with_ymd_and_hms(2014, 7, 9, 9, 10, 11).unwrap()),
-            true
-        );
-
-        assert_eq!(observer.wake, Some(TimeDelta::days(1)));
-
-        let h = observer.hours_after_now(Local.with_ymd_and_hms(2014, 7, 8, 9, 12, 11).unwrap());
-        assert_eq!(h, 0);
-        assert_eq!(observer.wake, Some(TimeDelta::minutes(62)));
-
-        let h = observer.hours_after_now(Local.with_ymd_and_hms(2014, 7, 8, 9, 8, 11).unwrap());
-        assert_eq!(h, 0);
-        assert_eq!(observer.wake, Some(TimeDelta::minutes(58)));
     }
 }

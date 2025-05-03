@@ -6,6 +6,7 @@ use std::borrow::Borrow;
 use std::borrow::BorrowMut;
 mod log_item;
 mod roll;
+pub mod time_observer;
 
 #[component]
 pub(crate) fn Body() -> Element {
