@@ -2,9 +2,9 @@ use caith::Roller;
 use dioxus::prelude::*;
 use dioxus_markdown::Markdown;
 
-use crate::Log;
+use crate::{Log, LogItem};
 
-use std::ops::Deref;
+use std::{ops::Deref, vec};
 
 /**
  * Display text, or a roll button depending on if string is a valid roll specification (in caith dice notation).
@@ -34,20 +34,22 @@ pub(crate) fn ConstantRoll(spec: String) -> Element {
                     button {
                         onclick: move |_| {
                             let roll = roller.roll().unwrap();
+                            let mut log_lines = vec![];
                             if let Some(single) = roll.as_single() {
                                 let message = single.to_string(true);
                                 let msg = format!("{spec}: {message}");
-                                log.write().log.push(msg);
+                                log_lines.push(msg);
                             } else {
                                 let roll = roll.as_repeated().unwrap();
                                 for single in roll.deref() {
                                     let message = single.to_string(true);
-                                    let msg = format!("\u{00a0}\u{00a0}\u{00a0}\u{00a0}{message}");
-                                    log.write().log.push(msg);
+                                    let msg = format!("  - {message}");
+                                    log_lines.push(msg);
                                 }
                                 let total = roll.get_total().map_or("".to_owned(), |x| x.to_string());
-                                log.write().log.push(format!("{spec}: **{total}**"));
+                                log_lines.push(format!("\n{spec}: **{total}**"));
                             }
+                            log.write().log.push(LogItem::new(log_lines.join("\n")));
                         },
                         "{spec}"
                     }

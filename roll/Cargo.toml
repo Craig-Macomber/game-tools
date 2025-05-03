@@ -12,6 +12,7 @@ dioxus = { version = "0.6.3", features = [] }
 # Has a fix for https://github.com/Geobert/caith/issues/5
 caith = { git = "https://github.com/Craig-Macomber/caith", branch = "cleanup" }
 dioxus-markdown = { git = "https://github.com/Craig-Macomber/rust-web-markdown", rev = "809fbb99f52c219a60bac5345e2f3e271abc41f8" }
+chrono = { version = "0.4", features = ["now", "wasmbind"] }
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 # caith pulls in "getrandom" which needs custom features to support WASM:

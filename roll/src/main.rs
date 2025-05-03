@@ -7,9 +7,26 @@ struct State {
 
 #[derive(Debug, Default, Clone)]
 struct Log {
-    log: Vec<String>,
+    log: Vec<LogItem>,
 }
 
+#[derive(Debug, Clone, PartialEq)]
+struct LogItem {
+    markdown: String,
+    timestamp: chrono::DateTime<Local>,
+}
+
+impl LogItem {
+    fn new(markdown: String) -> Self {
+        let timestamp = chrono::Local::now();
+        LogItem {
+            markdown,
+            timestamp,
+        }
+    }
+}
+
+use chrono::Local;
 use dioxus::prelude::*;
 
 // const FAVICON: Asset = asset!("/assets/favicon.ico");

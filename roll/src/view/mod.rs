@@ -1,10 +1,10 @@
 use crate::{Log, State};
 
 use dioxus::prelude::*;
-use dioxus_markdown::Markdown;
 
 use std::borrow::Borrow;
 use std::borrow::BorrowMut;
+mod log_item;
 mod roll;
 
 #[component]
@@ -73,7 +73,7 @@ pub(crate) fn Body() -> Element {
                 div { class: "column",
                     h2 { "Log:" }
                     for message in log.read().borrow().log.iter().rev() {
-                        Markdown { src: "{message}" }
+                        log_item::LogItemView { item: message.clone() }
                     }
                 }
             }
