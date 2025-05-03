@@ -12,10 +12,12 @@ pub struct TimeObserver {
 }
 
 impl TimeObserver {
+    /// Create a new TimeObserver which treats the current time as `now`.
     pub fn new(now: DateTime<Local>) -> Self {
         TimeObserver { now, wake: None }
     }
 
+    /// True if `t` is in the future.
     pub fn in_future(&mut self, t: DateTime<Local>) -> bool {
         let delta = t - self.now;
         if delta > TimeDelta::zero() {
@@ -26,6 +28,9 @@ impl TimeObserver {
         }
     }
 
+    /// How far in the future is `t` in hours.
+    ///
+    /// Rounded toward zero.
     pub fn hours_after_now(&mut self, t: DateTime<Local>) -> i64 {
         let delta = t - self.now;
         let hours = delta.num_hours();
@@ -34,6 +39,9 @@ impl TimeObserver {
         hours
     }
 
+    /// How far in the future is `t` in minutes.
+    ///
+    /// Rounded toward zero.
     pub fn minutes_after_now(&mut self, t: DateTime<Local>) -> i64 {
         let delta = t - self.now;
         let minutes = delta.num_minutes();
@@ -42,6 +50,9 @@ impl TimeObserver {
         minutes
     }
 
+    /// How far in the future is `t` in seconds.
+    ///
+    /// Rounded toward zero.
     pub fn seconds_after_now(&mut self, t: DateTime<Local>) -> i64 {
         let delta = t - self.now;
         let seconds = delta.num_seconds();
@@ -50,7 +61,7 @@ impl TimeObserver {
         seconds
     }
 
-    pub(crate) fn wake(&mut self, d: TimeDelta) {
+    fn wake(&mut self, d: TimeDelta) {
         if let Some(old) = self.wake {
             if old < d {
                 return;
@@ -59,6 +70,7 @@ impl TimeObserver {
         self.wake = Some(d);
     }
 
+    /// Get the deadline at which the results of queries made on this TimeObserver will become out of date.
     pub fn into_deadline(self) -> Option<DateTime<Local>> {
         self.wake.map(|delta| self.now + delta)
     }
