@@ -65,6 +65,7 @@ pub(crate) fn ConstantRoll(spec: String) -> Element {
     }
 }
 
+#[cfg(test)]
 mod tests {
 
     // Regression tests for https://github.com/Geobert/caith/issues/5
