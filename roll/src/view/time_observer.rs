@@ -1,4 +1,5 @@
 use chrono::DateTime;
+use chrono::Duration;
 use chrono::Local;
 use chrono::TimeDelta;
 
@@ -59,6 +60,34 @@ impl TimeObserver {
         let wake = delta - TimeDelta::seconds(if seconds > 0 { seconds } else { seconds - 1 });
         self.wake(wake);
         seconds
+    }
+
+    /// Returns a value [0, 1] based on how far from start to end the current time is.
+    ///
+    /// * `precision` - how far off the value can get before waking up to get a new one. Provide 0.0 to animate as fast as possible.
+    pub fn lerp(&mut self, start: DateTime<Local>, end: DateTime<Local>, precision: f32) -> f32 {
+        if !self.in_future(end) {
+            return 1.0;
+        }
+
+        if self.in_future(start) {
+            return 0.0;
+        }
+
+        let current = self.now - start;
+        let length = end - start;
+        let phase = current.as_seconds_f32() / length.as_seconds_f32();
+        debug_assert!(phase >= 0.0);
+        debug_assert!(phase <= 1.0);
+
+        self.wake(
+            Duration::from_std(std::time::Duration::from_secs_f32(
+                length.as_seconds_f32() * precision,
+            ))
+            .unwrap(),
+        );
+
+        phase
     }
 
     fn wake(&mut self, d: TimeDelta) {

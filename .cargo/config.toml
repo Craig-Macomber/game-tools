@@ -1,5 +1,5 @@
 [build]
-# target = "wasm32-unknown-unknown"
+target = "wasm32-unknown-unknown"
 
 [target.wasm32-unknown-unknown]
 # The dependency getrandom needs this flag set, but only when the target is wasm32-unknown-unknown.
