@@ -4,6 +4,7 @@ use dioxus::prelude::*;
 
 use std::borrow::Borrow;
 use std::borrow::BorrowMut;
+pub mod dioxus_time;
 mod log_item;
 mod roll;
 pub mod time_observer;
