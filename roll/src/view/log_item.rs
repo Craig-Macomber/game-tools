@@ -92,18 +92,17 @@ fn use_time<T, F: FnOnce(&mut TimeObserver) -> T>(f: F) -> T {
         #[cfg(target_arch = "wasm32")]
         if (deadline - now) <= chrono::TimeDelta::milliseconds(50) {
             dioxus::logger::tracing::trace!("do animation");
-            use wasm_bindgen::JsCast;
+            use wasm_bindgen::{closure, JsCast};
+            let closure = closure::Closure::once_into_js(update);
             let window = web_sys::window().expect("no global `window` exists");
-            let closure = wasm_bindgen::closure::Closure::once_into_js(move || {
-                dioxus::logger::tracing::trace!("animated");
-                update();
-            });
-
             window
                 .request_animation_frame(closure.as_ref().unchecked_ref())
                 .unwrap();
             return result;
         }
+
+        // TODO: For platforms other than wasm32, implement some animation/update throttling.
+
         spawn(async move {
             sleep_until(deadline).await;
             update();
