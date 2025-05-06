@@ -53,8 +53,14 @@ pub(crate) fn Body() -> Element {
             div { class: "row",
                 div { class: "column",
                     h2 { style: "flex: 0;", "Edit:" }
-                    a { href: "https://github.com/Geobert/caith?tab=readme-ov-file#syntax",
-                        "Syntax"
+                    span {
+                        "Syntax: "
+                        a { href: "https://commonmark.org/help/", "Markdown" }
+                        " with "
+                        a { href: "https://github.com/Geobert/caith?tab=readme-ov-file#syntax",
+                            "Caith dice notation"
+                        }
+                        "."
                     }
                     textarea {
                         style: "flex-grow: 1;",
