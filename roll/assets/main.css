@@ -42,6 +42,10 @@
     padding: 0.5rem;
 }
 
+.roll-button {
+    width: fit-content;
+}
+
 html {
     margin: 0;
     height: 100%;

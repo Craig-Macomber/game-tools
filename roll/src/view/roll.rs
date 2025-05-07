@@ -88,6 +88,7 @@ pub fn Roll(spec: String) -> Element {
         Ok(_) => {
             rsx!(
                 button {
+                    class: "roll-button",
                     onclick: move |_| {
                         let roll = roller.roll().unwrap();
                         let mut log_lines = vec![];
