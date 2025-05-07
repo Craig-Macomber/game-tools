@@ -12,7 +12,7 @@ dioxus = { version = "0.6.3", features = [] }
 # Has a fix for https://github.com/Geobert/caith/issues/5
 caith = { git = "https://github.com/Craig-Macomber/caith", branch = "cleanup" }
 # Disable default features to opt out of "math" since it is not supported on desktop builds
-dioxus-markdown = { git = "https://github.com/Craig-Macomber/rust-web-markdown", rev = "2ecbd8279cd97b753f5695c530ec979f3bb15989", default-features = false }
+dioxus-markdown = { git = "https://github.com/Craig-Macomber/rust-web-markdown", rev = "89a4482ffecac9d2c03ada93a44a56ba9c825264", default-features = false }
 chrono = { version = "0.4", features = ["now", "wasmbind"] }
 # async-std supports sleep/delay/timeout on wasm-unknown while tokio does not.
 async-std = { version = "1.13" }

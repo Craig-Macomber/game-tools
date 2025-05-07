@@ -1237,7 +1237,7 @@ dependencies = [
 [[package]]
 name = "dioxus-markdown"
 version = "0.0.1"
-source = "git+https://github.com/Craig-Macomber/rust-web-markdown?rev=2ecbd8279cd97b753f5695c530ec979f3bb15989#2ecbd8279cd97b753f5695c530ec979f3bb15989"
+source = "git+https://github.com/Craig-Macomber/rust-web-markdown?rev=89a4482ffecac9d2c03ada93a44a56ba9c825264#89a4482ffecac9d2c03ada93a44a56ba9c825264"
 dependencies = [
  "dioxus",
  "web-framework-markdown",
@@ -5066,7 +5066,7 @@ dependencies = [
 [[package]]
 name = "web-framework-markdown"
 version = "0.0.1"
-source = "git+https://github.com/Craig-Macomber/rust-web-markdown?rev=2ecbd8279cd97b753f5695c530ec979f3bb15989#2ecbd8279cd97b753f5695c530ec979f3bb15989"
+source = "git+https://github.com/Craig-Macomber/rust-web-markdown?rev=89a4482ffecac9d2c03ada93a44a56ba9c825264#89a4482ffecac9d2c03ada93a44a56ba9c825264"
 dependencies = [
  "lazy_static",
  "pulldown-cmark",
