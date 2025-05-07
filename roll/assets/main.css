@@ -5,23 +5,23 @@
 .row {
     display: flex;
     align-items: stretch;
+    flex-grow: 1;
+    flex-direction: row;
 }
 
 .column {
-    float: left;
     width: 33.33%;
     padding: 10px;
     flex-direction: column;
-    flex-grow: 1;
     display: flex;
-    min-height: 400px;
-}
+    flex-grow: 1;
 
-/* Clear floats after the columns */
-.row:after {
-    content: "";
-    display: table;
-    clear: both;
+    /*
+    TODO:
+    Each column should scroll once full.
+    Currently this does not work: the whole page scrolls instead.
+    */
+    overflow-y: scroll;
 }
 
 .bar {
@@ -42,7 +42,16 @@
     padding: 0.5rem;
 }
 
-.container {
-    display: flex;
+html {
+    margin: 0;
+    height: 100%;
     flex-direction: column;
+    display: flex;
+}
+
+body,
+#main {
+    flex-grow: 1;
+    flex-direction: column;
+    display: flex;
 }

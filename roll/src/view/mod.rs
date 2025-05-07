@@ -22,71 +22,69 @@ pub(crate) fn Body() -> Element {
     let lines2 = lines.clone();
 
     rsx!(
-        div { class: "container",
-            h1 { "Roller" }
-            div { class: "bar",
-                span { class: "bar-item",
-                    button { onclick: move |_| { save_url(&state.read().lines) }, "Save to URL" }
-                }
-                Storage {}
-                span { class: "bar-item",
-                    span { "Load File: " }
-                    input {
-                        r#type: "file",
-                        directory: false,
-                        accept: ".txt",
-                        multiple: false,
-                        onchange: move |evt| {
-                            async move {
-                                if let Some(file_engine) = evt.files() {
-                                    let files = file_engine.files();
-                                    for file_name in &files {
-                                        if let Some(file) = file_engine.read_file_to_string(file_name).await
-                                        {
-                                            state.write().borrow_mut().lines = file;
-                                        }
+        h1 { "Roller" }
+        div { class: "bar",
+            span { class: "bar-item",
+                button { onclick: move |_| { save_url(&state.read().lines) }, "Save to URL" }
+            }
+            Storage {}
+            span { class: "bar-item",
+                span { "Load File: " }
+                input {
+                    r#type: "file",
+                    directory: false,
+                    accept: ".txt",
+                    multiple: false,
+                    onchange: move |evt| {
+                        async move {
+                            if let Some(file_engine) = evt.files() {
+                                let files = file_engine.files();
+                                for file_name in &files {
+                                    if let Some(file) = file_engine.read_file_to_string(file_name).await
+                                    {
+                                        state.write().borrow_mut().lines = file;
                                     }
                                 }
                             }
-                        },
-                    }
+                        }
+                    },
                 }
             }
-            div { class: "row",
-                div { class: "column",
-                    h2 { style: "flex: 0;", "Edit:" }
-                    span {
-                        "Syntax: "
-                        a { href: "https://commonmark.org/help/", "Markdown" }
-                        " with "
-                        a { href: "https://github.com/Geobert/caith?tab=readme-ov-file#syntax",
-                            "Caith dice notation"
-                        }
-                        "."
+        }
+        div { class: "row",
+            div { class: "column",
+                h2 { style: "flex: 0;", "Edit:" }
+                span {
+                    "Syntax: "
+                    a { href: "https://commonmark.org/help/", "Markdown" }
+                    " with "
+                    a { href: "https://github.com/Geobert/caith?tab=readme-ov-file#syntax",
+                        "Caith dice notation"
                     }
-                    span {
-                        "Dice notation can be on its own line or in a "
+                    "."
+                }
+                span {
+                    "Dice notation can be on its own line or in a "
                     i { "<Roll src=\"dice here\"/>" }
-                        " tag."
-                    }
-                    textarea {
-                        style: "flex-grow: 1;",
-                        value: "{lines}",
-                        oninput: {
-                            move |event: Event<FormData>| {
-                                state.write().borrow_mut().lines = event.value();
-                            }
-                        },
-                    }
+                    " tag."
                 }
-                div { class: "column", style: "background-color:#aaa;",
-                    Rollers { lines: lines2 }
+                textarea {
+                    style: "flex-grow: 1;",
+                    value: "{lines}",
+                    oninput: {
+                        move |event: Event<FormData>| {
+                            state.write().borrow_mut().lines = event.value();
+                        }
+                    },
                 }
-                div { class: "column",
-                    h2 { "Log:" }
-                    for message in log.read().borrow().log.iter().rev() {
-                        log_item::LogItemView { item: message.clone() }
-                    }
+            }
+            div { class: "column", style: "background-color:#aaa;",
+                Rollers { lines: lines2 }
+            }
+            div { class: "column",
+                h2 { "Log:" }
+                for message in log.read().borrow().log.iter().rev() {
+                    log_item::LogItemView { item: message.clone() }
                 }
             }
         }
