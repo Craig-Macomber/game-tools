@@ -84,14 +84,6 @@ pub fn Roll(spec: String) -> Element {
     // Rolled only to see if there is an error.
     let dummy_roll = roller.roll();
 
-    // Empty line case
-    if spec.is_empty() {
-        return rsx!(
-            // Non-breaking 0 width space so span takes up a line
-            span { "\u{200b}" }
-        );
-    }
-
     match dummy_roll {
         Ok(_) => {
             rsx!(
