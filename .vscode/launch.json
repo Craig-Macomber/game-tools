@@ -27,11 +27,8 @@
                 }
             },
             "args": [],
-            "cwd": "${workspaceFolder}",
-            "env": {
-                "GTK_PATH": "",
-                "GIO_MODULE_DIR": "",
-            }
+            "program": "${workspaceFolder}/target/dx/roll/debug/linux/app/roll",
+            "cwd": "${workspaceFolder}/target/dx/roll/debug/linux/app"
         },
         {
             "type": "lldb",
