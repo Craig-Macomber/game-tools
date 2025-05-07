@@ -66,7 +66,7 @@ pub(crate) fn Body() -> Element {
                     }
                     span {
                         "Dice notation can be on its own line or in a "
-                        i { "<Roll src=\"dice here\">" }
+                    i { "<Roll src=\"dice here\"/>" }
                         " tag."
                     }
                     textarea {
