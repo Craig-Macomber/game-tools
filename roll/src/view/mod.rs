@@ -1,6 +1,7 @@
 use crate::{Log, State};
 
 use dioxus::prelude::*;
+use roll::Rollers;
 
 use std::borrow::Borrow;
 use std::borrow::BorrowMut;
@@ -18,6 +19,7 @@ pub(crate) fn Body() -> Element {
     let mut state = use_context::<Signal<State>>();
 
     let lines = state.read().lines.clone();
+    let lines2 = lines.clone();
 
     rsx!(
         div { class: "container",
@@ -62,6 +64,11 @@ pub(crate) fn Body() -> Element {
                         }
                         "."
                     }
+                    span {
+                        "Dice notation can be on its own line or in a "
+                        i { "<Roll src=\"dice here\">" }
+                        " tag."
+                    }
                     textarea {
                         style: "flex-grow: 1;",
                         value: "{lines}",
@@ -73,10 +80,7 @@ pub(crate) fn Body() -> Element {
                     }
                 }
                 div { class: "column", style: "background-color:#aaa;",
-                    h2 { "Roll:" }
-                    for line in lines.lines() {
-                        roll::ConstantRoll { spec: line }
-                    }
+                    Rollers { lines: lines2 }
                 }
                 div { class: "column",
                     h2 { "Log:" }

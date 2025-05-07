@@ -1,0 +1,56 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "lldb",
+            "request": "attach",
+            "name": "Attach Dx",
+            "program": "~/.cargo/bin/dx",
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug executable 'roll'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--bin=roll",
+                    "--package=roll",
+                    "--features=dioxus/desktop"
+                ],
+                "filter": {
+                    "name": "roll",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            "env": {
+                "GTK_PATH": "",
+                "GIO_MODULE_DIR": "",
+            }
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in executable 'roll'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--bin=roll",
+                    "--package=roll"
+                ],
+                "filter": {
+                    "name": "roll",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        }
+    ]
+}

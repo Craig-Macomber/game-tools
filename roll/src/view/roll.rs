@@ -1,6 +1,6 @@
 use caith::Roller;
 use dioxus::prelude::*;
-use dioxus_markdown::Markdown;
+use dioxus_markdown::{CustomComponents, Markdown};
 
 use crate::{Log, LogItem};
 
@@ -10,7 +10,72 @@ use std::{ops::Deref, vec};
  * Display text, or a roll button depending on if string is a valid roll specification (in caith dice notation).
  */
 #[component]
-pub(crate) fn ConstantRoll(spec: String) -> Element {
+pub(crate) fn Rollers(lines: String) -> Element {
+    let mut components = CustomComponents::new();
+
+    components.register("Counter", |props| {
+        Ok(rsx! {
+            Counter { initial: props.get_parsed_optional("initial")?.unwrap_or(0) }
+        })
+    });
+
+    components.register("Roll", |props| {
+        Ok(rsx! {
+            Roll { spec: props.get("src").unwrap_or("Invalid".to_string()) }
+        })
+    });
+
+    let mut markdown: Vec<String> = vec![];
+    for line in lines.lines() {
+        let roller = try_roller(line);
+        match roller {
+            Some(r) => markdown.push(format!("<Roll src=\"{line}\"/>")),
+            None => markdown.push(line.to_string()),
+        }
+    }
+
+    rsx!(
+        h2 { "Roll:" }
+        Markdown { src: markdown.join("\n"), components }
+    )
+}
+
+pub fn try_roller(spec: &str) -> Option<String> {
+    // Always succeeds: errors are deferred until rolling.
+    let roller = Roller::new(&spec).unwrap();
+
+    // Rolled only to see if there is an error.
+    let dummy_roll = roller.roll();
+
+    // Empty line case
+    if spec.is_empty() {
+        return None;
+    }
+
+    match dummy_roll {
+        Ok(_) => Some(spec.to_string()),
+        Err(d) => None,
+    }
+}
+
+#[component]
+fn Counter(initial: i32) -> Element {
+    let mut count = use_signal(|| initial);
+
+    rsx! {
+        div {
+            button { onclick: move |_| count -= 1, "-" }
+            "{count}"
+            button { onclick: move |_| count += 1, "+" }
+        }
+    }
+}
+
+/**
+ * Display text, or a roll button depending on if string is a valid roll specification (in caith dice notation).
+ */
+#[component]
+pub fn Roll(spec: String) -> Element {
     let mut log = use_context::<Signal<Log>>();
 
     // Always succeeds: errors are deferred until rolling.
@@ -30,29 +95,27 @@ pub(crate) fn ConstantRoll(spec: String) -> Element {
     match dummy_roll {
         Ok(_) => {
             rsx!(
-                div { style: "display: flex;",
-                    button {
-                        onclick: move |_| {
-                            let roll = roller.roll().unwrap();
-                            let mut log_lines = vec![];
-                            if let Some(single) = roll.as_single() {
+                button {
+                    onclick: move |_| {
+                        let roll = roller.roll().unwrap();
+                        let mut log_lines = vec![];
+                        if let Some(single) = roll.as_single() {
+                            let message = single.to_string(true);
+                            let msg = format!("{spec}: {message}");
+                            log_lines.push(msg);
+                        } else {
+                            let roll = roll.as_repeated().unwrap();
+                            for single in roll.deref() {
                                 let message = single.to_string(true);
-                                let msg = format!("{spec}: {message}");
+                                let msg = format!("  - {message}");
                                 log_lines.push(msg);
-                            } else {
-                                let roll = roll.as_repeated().unwrap();
-                                for single in roll.deref() {
-                                    let message = single.to_string(true);
-                                    let msg = format!("  - {message}");
-                                    log_lines.push(msg);
-                                }
-                                let total = roll.get_total().map_or("".to_owned(), |x| x.to_string());
-                                log_lines.push(format!("\n{spec}: **{total}**"));
                             }
-                            log.write().log.push(LogItem::new(log_lines.join("\n")));
-                        },
-                        "{spec}"
-                    }
+                            let total = roll.get_total().map_or("".to_owned(), |x| x.to_string());
+                            log_lines.push(format!("\n{spec}: **{total}**"));
+                        }
+                        log.write().log.push(LogItem::new(log_lines.join("\n")));
+                    },
+                    "{spec}"
                 }
             )
         }

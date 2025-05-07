@@ -85,7 +85,7 @@ fn load_default() -> String {
     }
 }
 
-static DEFAULT_TEXT: &'static str = "## Examples:
+static DEFAULT_TEXT: &'static str = r#"## Examples:
 1d20
 2d6 + 1d4 + 5
 
@@ -99,7 +99,10 @@ static DEFAULT_TEXT: &'static str = "## Examples:
 (2d6 + 6) ^+ 8
 
 ## Re-roll ones:
-8d6 r1";
+8d6 r1
+
+## Inline
+**Stab:** <Roll src="1d20+5"/> to hit dealing <Roll src="2d6"/> on hit."#;
 
 #[cfg(target_arch = "wasm32")]
 fn save_url(data: &str) {
