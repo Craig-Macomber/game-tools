@@ -35,7 +35,7 @@ pub(crate) fn Rollers(lines: String) -> Element {
     for line in lines.lines() {
         let roller = try_roller(line);
         match roller {
-            Some(r) => markdown.push(format!("<R d=\"{line}\"/>")),
+            Some(_) => markdown.push(format!("<R d=\"{line}\"/>")),
             None => markdown.push(line.to_string()),
         }
     }
@@ -62,7 +62,7 @@ pub fn try_roller(spec: &str) -> Option<String> {
 
     match dummy_roll {
         Ok(_) => Some(spec.to_string()),
-        Err(d) => None,
+        Err(_) => None,
     }
 }
 
