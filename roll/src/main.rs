@@ -85,24 +85,27 @@ fn load_default() -> String {
     }
 }
 
-static DEFAULT_TEXT: &'static str = r#"## Examples:
+static DEFAULT_TEXT: &'static str = r#"# Examples:
 1d20
 2d6 + 1d4 + 5
 
-## Advantage:
+# Advantage:
 2d20 K1
 
-## Disadvantage:
+# Disadvantage:
 2d20 k1
 
-## Repeated rolls:
+# Repeated rolls:
 (2d6 + 6) ^+ 8
 
-## Re-roll ones:
+# Re-roll ones:
 8d6 r1
 
-## Inline
-**Stab:** <Roll src="1d20+5"/> to hit dealing <Roll src="2d6"/> on hit."#;
+# Inline
+**Stab:** <Roll src="1d20+5"/> to hit dealing <Roll src="2d6"/> on hit.
+
+**Other:** <Roll src="1d20+5"/> to hit dealing <Roll src="2d6"/> **cold** damage on hit.
+"#;
 
 #[cfg(target_arch = "wasm32")]
 fn save_url(data: &str) {

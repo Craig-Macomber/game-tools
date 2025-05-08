@@ -19,6 +19,7 @@ pub(crate) fn LogItemView(item: LogItem) -> Element {
         rsx!(
             // TODO: proper accessible tooltip
             span {
+                class: "message",
                 title: "{format_relative_time(item.timestamp, t)}",
                 opacity: fade,
                 Markdown { src: "{item.markdown}" }

@@ -2,6 +2,16 @@
     box-sizing: border-box;
 }
 
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    margin-bottom: 0.15rem;
+    margin-top: 0.2rem
+}
+
 .row {
     display: flex;
     align-items: stretch;
@@ -37,10 +47,54 @@
     padding: 0.5rem;
 }
 
-.message {
-    flex-grow: 1;
+.message p {
+    margin: 0.5rem;
+    margin-top: 0.1rem;
+}
+
+.message ul {
+    margin: 0;
+}
+
+#Roll {
+    background-color: #eee;
+}
+
+#Roll-Content {
+    background-color: #ccc;
     padding: 0.5rem;
 }
+
+#Roll-Content p {
+    margin-top: 0;
+    margin-bottom: 0.5em;
+}
+
+#Roll-Content h1 {
+    font-size: 1.5em;
+}
+
+#Roll-Content h2 {
+    font-size: 1.17em;
+}
+
+#Roll-Content h3 {
+    font-size: 1em;
+}
+
+#Roll-Content h4 {
+    font-size: .83em;
+}
+
+#Roll-Content h5 {
+    font-size: .67em;
+}
+
+#Roll-Content h6 {
+    font-size: .6em;
+}
+
+
 
 .roll-button {
     width: fit-content;

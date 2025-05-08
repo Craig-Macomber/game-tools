@@ -36,7 +36,9 @@ pub(crate) fn Rollers(lines: String) -> Element {
 
     rsx!(
         h2 { "Roll:" }
-        Markdown { src: markdown.join("\n"), components }
+        div { id: "Roll-Content",
+            Markdown { src: markdown.join("\n"), components }
+        }
     )
 }
 

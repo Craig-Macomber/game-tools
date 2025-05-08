@@ -78,7 +78,7 @@ pub(crate) fn Body() -> Element {
                     },
                 }
             }
-            div { class: "column", style: "background-color:#aaa;",
+            div { class: "column", id: "Roll",
                 Rollers { lines: lines2 }
             }
             div { class: "column",
