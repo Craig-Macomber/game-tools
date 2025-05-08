@@ -29,7 +29,7 @@ impl LogItem {
 use chrono::Local;
 use dioxus::prelude::*;
 
-// const FAVICON: Asset = asset!("/assets/favicon.ico");
+const FAVICON: Asset = asset!("/assets/favicon_io/favicon.ico");
 const MAIN_CSS: Asset = asset!("/assets/main.css");
 
 fn main() {
@@ -44,10 +44,8 @@ fn App() -> Element {
         })
     });
     rsx! {
+        document::Link { rel: "icon", href: FAVICON }
         document::Link { rel: "stylesheet", href: MAIN_CSS }
-        // Instead of using the assert, inline the css to work around absolute path issues in deployment.
-        // style { {include_str!("../assets/main.css")} }
-
         view::Body {}
     }
 }
