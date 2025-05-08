@@ -102,9 +102,9 @@ static DEFAULT_TEXT: &'static str = r#"# Examples:
 8d6 r1
 
 # Inline
-**Stab:** <Roll src="1d20+5"/> to hit dealing <Roll src="2d6"/> on hit.
+**Stab:** <Roll d="1d20+5"/> to hit dealing <Roll d="2d6"/> on hit.
 
-**Other:** <Roll src="1d20+5"/> to hit dealing <Roll src="2d6"/> **cold** damage on hit.
+**Other:** <Roll d="1d20+5"/> to hit dealing <Roll d="2d6"/> **cold** damage on hit.
 "#;
 
 #[cfg(target_arch = "wasm32")]

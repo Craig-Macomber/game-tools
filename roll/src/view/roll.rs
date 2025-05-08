@@ -21,7 +21,13 @@ pub(crate) fn Rollers(lines: String) -> Element {
 
     components.register("Roll", |props| {
         Ok(rsx! {
-            Roll { spec: props.get("src").unwrap_or("Invalid".to_string()) }
+            Roll { spec: props.get("d").unwrap_or("Invalid".to_string()) }
+        })
+    });
+
+    components.register("R", |props| {
+        Ok(rsx! {
+            Roll { spec: props.get("d").unwrap_or("Invalid".to_string()) }
         })
     });
 
@@ -29,7 +35,7 @@ pub(crate) fn Rollers(lines: String) -> Element {
     for line in lines.lines() {
         let roller = try_roller(line);
         match roller {
-            Some(r) => markdown.push(format!("<Roll src=\"{line}\"/>")),
+            Some(r) => markdown.push(format!("<R d=\"{line}\"/>")),
             None => markdown.push(line.to_string()),
         }
     }
