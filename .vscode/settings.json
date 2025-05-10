@@ -5,6 +5,7 @@
     "chrono",
     "dioxus",
     "lerp",
+    "onclick",
     "oninput",
     "onsubmit"
   ],

@@ -114,6 +114,7 @@ fn save_url(data: &str) {
     location.set_hash(&encoded).unwrap();
 }
 
+#[cfg(target_arch = "wasm32")]
 static STORAGE_KEY: &'static str = "roller: text";
 
 #[cfg(target_arch = "wasm32")]
