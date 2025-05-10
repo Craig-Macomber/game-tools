@@ -16,12 +16,14 @@ pub(crate) fn LogItemView(item: LogItem) -> Element {
     use_time(|t| {
         // TODO: this should probably use CSS animation for better efficiency.
         let fade = t.lerp(item.timestamp, item.timestamp + Duration::seconds(1), 0.002);
+        let time = format_relative_time(item.timestamp, t);
         rsx!(
             // TODO: proper accessible tooltip
             span {
                 class: "message",
                 title: "{format_relative_time(item.timestamp, t)}",
                 opacity: fade,
+                span { class: "timestamp", "{time}" }
                 Markdown { src: "{item.markdown}" }
             }
         )

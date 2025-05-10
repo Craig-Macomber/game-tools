@@ -56,6 +56,10 @@ h6 {
     margin: 0;
 }
 
+.timestamp {
+    font-size: 0.8em;
+}
+
 #Roll {
     background-color: #eee;
 }
@@ -69,6 +73,9 @@ h6 {
     margin-top: 0;
     margin-bottom: 0.5em;
 }
+
+
+/* Shrink the larger sizes of headers in the Roll-Content so they are smaller than the headers used in the layout of the app */
 
 #Roll-Content h1 {
     font-size: 1.5em;
