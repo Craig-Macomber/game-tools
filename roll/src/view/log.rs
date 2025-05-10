@@ -67,7 +67,9 @@ pub fn LogStorage() -> Element {
 #[cfg(target_arch = "wasm32")]
 fn write_log_to_local_storage(log: &Vec<LogItem>) {
     // if load_storage(LOG_STORAGE_KEY).is_none() && log.is_empty() {
-    //     // Lets clear with sync actually work.
+    //     // Lets clear with sync actually work, and return to the default state of not using local storage for the log.
+    //     // This also means someone using sync mode will remove default sync mode when clearing if refreshing before logging anything,
+    //     // which doesn't seem like a consistent behavior.
     //     return;
     // }
 
@@ -90,10 +92,6 @@ pub fn ClearButton() -> Element {
         button {
             onclick: move |_| {
                 *LOG.write() = Log { sync, log: Vec::default() };
-                #[cfg(target_arch = "wasm32")]
-                if sync {
-                    save_storage(LOG_STORAGE_KEY, None)
-                }
             },
             "Clear"
         }
@@ -102,16 +100,31 @@ pub fn ClearButton() -> Element {
 
 #[component]
 pub fn LoadButton() -> Element {
-    rsx!(
-        button {
-            onclick: move |_| {
-                *LOG.write() = load_or_new_log(false);
-                LOG.write().sync = true;
-            },
-            disabled: LOG.read().sync,
-            "Load Local Storage"
-        }
-    )
+    let sync = LOG.read().sync;
+    if sync {
+        rsx!(
+            button {
+                onclick: move |_| {
+                    LOG.write().sync = false;
+                    #[cfg(target_arch = "wasm32")]
+                    if sync {
+                        save_storage(LOG_STORAGE_KEY, None)
+                    }
+                },
+                "Disable Local Storage"
+            }
+        )
+    } else {
+        rsx!(
+            button {
+                onclick: move |_| {
+                    *LOG.write() = load_or_new_log(false);
+                    LOG.write().sync = true;
+                },
+                "Load Local Storage"
+            }
+        )
+    }
 }
 
 pub(crate) fn load_or_new_log(skip_load_message: bool) -> Log {
