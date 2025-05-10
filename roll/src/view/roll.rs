@@ -2,12 +2,12 @@ use caith::Roller;
 use dioxus::prelude::*;
 use dioxus_markdown::{CustomComponents, Markdown};
 
-use crate::{Log, LogItem};
+use crate::{view::log::LOG, LogItem};
 
 use std::{ops::Deref, vec};
 
 /**
- * Display text, or a roll button depending on if string is a valid roll specification (in caith dice notation).
+ * Rendered markdown results with inline rollers that put their result in "Log".
  */
 #[component]
 pub(crate) fn Rollers(lines: String) -> Element {
@@ -84,8 +84,6 @@ fn Counter(initial: i32) -> Element {
  */
 #[component]
 pub fn Roll(spec: String) -> Element {
-    let mut log = use_context::<Signal<Log>>();
-
     // Always succeeds: errors are deferred until rolling.
     let roller = Roller::new(&spec).unwrap();
 
@@ -114,7 +112,7 @@ pub fn Roll(spec: String) -> Element {
                             let total = roll.get_total().map_or("".to_owned(), |x| x.to_string());
                             log_lines.push(format!("\n{spec}: **{total}**"));
                         }
-                        log.write().log.push(LogItem::new(log_lines.join("\n")));
+                        LOG.write().log.push(LogItem::new(log_lines.join("\n")));
                     },
                     "{spec}"
                 }

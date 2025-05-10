@@ -13,17 +13,20 @@ dioxus = { version = "0.6.3", features = [] }
 caith = { git = "https://github.com/Craig-Macomber/caith", branch = "cleanup" }
 # Disable default features to opt out of "math" since it is not supported on desktop builds
 dioxus-markdown = { git = "https://github.com/Craig-Macomber/rust-web-markdown", rev = "89a4482ffecac9d2c03ada93a44a56ba9c825264", default-features = false }
-chrono = { version = "0.4", features = ["now", "wasmbind"] }
+chrono = { version = "0.4", features = ["now", "wasmbind", "serde"] }
 # async-std supports sleep/delay/timeout on wasm-unknown while tokio does not.
 async-std = { version = "1.13" }
+serde_json = "1.0.140"
+serde = "1.0.219"
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 # caith pulls in "getrandom" which needs custom features to support WASM:
 getrandom = { version = "0.3.2", features = ["wasm_js"] }
 web-sys = { version = "0.3.76", features = [
-    'Document',
+    "Document",
     "Location",
     "Storage",
+    "StorageEvent",
     "Window",
 ] }
 js-sys = { version = "0.3.76" }

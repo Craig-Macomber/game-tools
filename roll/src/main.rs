@@ -5,14 +5,16 @@ struct State {
     lines: String,
 }
 
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 struct Log {
+    sync: bool,
     log: Vec<LogItem>,
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 struct LogItem {
     markdown: String,
+    // TODO: serializing local time is not ideal: should convert to utc
     timestamp: chrono::DateTime<Local>,
 }
 
@@ -26,8 +28,12 @@ impl LogItem {
     }
 }
 
+#[cfg(target_arch = "wasm32")]
+use std::{collections::HashMap, sync::LazyLock};
+
 use chrono::Local;
 use dioxus::prelude::*;
+use serde::{Deserialize, Serialize};
 
 const FAVICON: Asset = asset!("/assets/favicon_io/favicon.ico");
 const MAIN_CSS: Asset = asset!("/assets/main.css");
@@ -78,8 +84,9 @@ fn load_default() -> String {
 
     #[cfg(target_arch = "wasm32")]
     {
-        return load_url()
-            .unwrap_or_else(|| load_storage().unwrap_or_else(|| DEFAULT_TEXT.to_owned()));
+        return load_url().unwrap_or_else(|| {
+            load_storage(STORAGE_KEY).unwrap_or_else(|| DEFAULT_TEXT.to_owned())
+        });
     }
 }
 
@@ -118,20 +125,68 @@ fn save_url(data: &str) {
 static STORAGE_KEY: &'static str = "roller: text";
 
 #[cfg(target_arch = "wasm32")]
-fn save_storage(data: Option<&str>) {
+fn save_storage(key: &str, data: Option<&str>) {
     let window = web_sys::window().unwrap();
     let storage = window.local_storage().unwrap().unwrap();
     match data {
-        Some(data) => storage.set_item(STORAGE_KEY, data).unwrap(),
-        None => storage.remove_item(STORAGE_KEY).unwrap(),
+        Some(data) => storage.set_item(key, data).unwrap(),
+        None => storage.remove_item(key).unwrap(),
     }
 }
 
 #[cfg(target_arch = "wasm32")]
-fn load_storage() -> Option<String> {
+fn load_storage(key: &str) -> Option<String> {
     let window = web_sys::window()?;
     let storage = window.local_storage().unwrap_or(None)?;
-    storage.get_item(STORAGE_KEY).unwrap_or(None)
+    storage.get_item(key).unwrap_or(None)
+}
+
+#[cfg(target_arch = "wasm32")]
+struct OnStorage {
+    callbacks: HashMap<String, Vec<Box<dyn Fn() -> CallbackRetention + Sync + Send>>>,
+}
+
+pub enum CallbackRetention {
+    Keep,
+    Remove,
+}
+
+#[cfg(target_arch = "wasm32")]
+static ON_STORAGE: LazyLock<std::sync::Mutex<OnStorage>> = LazyLock::new(|| {
+    use wasm_bindgen::prelude::*;
+
+    let window = web_sys::window().unwrap();
+    assert!(window.onstorage().is_none());
+
+    let closure: Closure<dyn FnMut(web_sys::StorageEvent)> =
+        Closure::new(move |event: web_sys::StorageEvent| {
+            // https://developer.mozilla.org/en-US/docs/Web/API/Window/storage_event#event_properties
+            let s = &mut *ON_STORAGE.lock().unwrap();
+            let key = event.key().unwrap();
+            s.callbacks.entry(key).and_modify(|callbacks| {
+                callbacks.retain(|callback| match callback() {
+                    CallbackRetention::Keep => true,
+                    CallbackRetention::Remove => false,
+                });
+            });
+        });
+
+    window.set_onstorage(Some(wasm_bindgen::JsCast::unchecked_ref(closure.as_ref())));
+    closure.forget(); // Leak closure: since this is part of a static it living forever is fine.
+
+    OnStorage {
+        callbacks: HashMap::new(),
+    }
+    .into()
+});
+
+#[cfg(target_arch = "wasm32")]
+pub fn on_storage(key: &str, callback: Box<dyn Fn() -> CallbackRetention + Sync + Send>) {
+    let s = &mut *ON_STORAGE.lock().unwrap();
+    s.callbacks
+        .entry(key.to_string())
+        .or_default()
+        .push(callback);
 }
 
 #[cfg(not(target_arch = "wasm32"))]

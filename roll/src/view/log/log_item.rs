@@ -6,7 +6,7 @@ use crate::LogItem;
 
 use std::vec;
 
-use super::{dioxus_time::use_time, time_observer::TimeObserver};
+use super::super::{dioxus_time::use_time, time_observer::TimeObserver};
 
 /**
  * Display log item.

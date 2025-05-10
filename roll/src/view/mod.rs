@@ -1,20 +1,18 @@
-use crate::{Log, State};
+use crate::State;
 
 use dioxus::prelude::*;
+use log::LogView;
 use roll::Rollers;
 
-use std::borrow::Borrow;
 use std::borrow::BorrowMut;
 pub mod dioxus_time;
-mod log_item;
+mod log;
 mod roll;
 pub mod time_observer;
 
 #[component]
 pub(crate) fn Body() -> Element {
     use crate::save_url;
-
-    let log = use_context_provider(|| Signal::new(Log::default()));
 
     let mut state = use_context::<Signal<State>>();
 
@@ -81,12 +79,7 @@ pub(crate) fn Body() -> Element {
             div { class: "column", id: "Roll",
                 Rollers { lines: lines2 }
             }
-            div { class: "column",
-                h2 { "Log:" }
-                for message in log.read().borrow().log.iter().rev() {
-                    log_item::LogItemView { item: message.clone() }
-                }
-            }
+            div { class: "column", id: "Log", LogView {} }
         }
         div { class: "bar",
             span { class: "bar-item",
@@ -108,18 +101,19 @@ pub(crate) fn Body() -> Element {
 #[component]
 #[cfg(target_arch = "wasm32")]
 fn Storage() -> Element {
-    use crate::{load_storage, save_storage, save_url};
+    use crate::{load_storage, save_storage, STORAGE_KEY};
 
     let mut state = use_context::<Signal<State>>();
-    let lines = state.read().lines.clone();
 
     rsx!(
         span { class: "bar-item",
             "Local Storage:"
-            button { onclick: move |_| { save_storage(Some(&state.read().lines)) }, "Save" }
+            button { onclick: move |_| { save_storage(STORAGE_KEY, Some(&state.read().lines)) },
+                "Save"
+            }
             button {
                 onclick: move |_| {
-                    let storage = load_storage();
+                    let storage = load_storage(STORAGE_KEY);
                     match storage {
                         Some(data) => {
                             state.write().borrow_mut().lines = data;
@@ -134,7 +128,7 @@ fn Storage() -> Element {
                 },
                 "Load"
             }
-            button { onclick: |_| { save_storage(None) }, "Clear" }
+            button { onclick: |_| { save_storage(STORAGE_KEY, None) }, "Clear" }
         }
     )
 }
