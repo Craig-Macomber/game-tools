@@ -28,9 +28,12 @@ pub fn use_time<T, F: FnOnce(&mut TimeObserver) -> T>(f: F) -> T {
 
         let mut update = move || {
             let now = Local::now();
-            if *signal.peek() < deadline {
-                dioxus::logger::tracing::trace!("wake");
-                signal.set(now);
+            let last_time = signal.try_peek().map(|t| *t);
+            if let Ok(last_time) = last_time {
+                if last_time < deadline {
+                    dioxus::logger::tracing::trace!("wake");
+                    signal.set(now);
+                }
             }
         };
 
