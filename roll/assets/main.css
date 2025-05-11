@@ -2,6 +2,11 @@
     box-sizing: border-box;
 }
 
+h1 {
+    margin: 1rem;
+}
+
+
 h1,
 h2,
 h3,
@@ -17,6 +22,13 @@ h6 {
     align-items: stretch;
     flex-grow: 1;
     flex-direction: row;
+
+    margin: 0;
+    display: flex;
+    width: 100%;
+
+    /* Used as the flex basis, effectively the minimum size */
+    height: 100px;
 }
 
 .column {
@@ -25,12 +37,6 @@ h6 {
     flex-direction: column;
     display: flex;
     flex-grow: 1;
-
-    /*
-    TODO:
-    Each column should scroll once full.
-    Currently this does not work: the whole page scrolls instead.
-    */
     overflow-y: scroll;
 }
 
@@ -110,13 +116,19 @@ h6 {
 html {
     margin: 0;
     height: 100%;
-    flex-direction: column;
     display: flex;
 }
 
-body,
+body {
+    margin: 0;
+    display: flex;
+    height: 100%;
+    width: 100%;
+}
+
 #main {
-    flex-grow: 1;
     flex-direction: column;
     display: flex;
+    height: 100%;
+    width: 100%;
 }
