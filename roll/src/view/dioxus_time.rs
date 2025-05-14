@@ -1,47 +1,42 @@
 use chrono::{DateTime, Local};
 use dioxus::prelude::*;
 
-use std::future::Future;
+use std::{future::Future, sync::Arc};
 
 use super::time_observer::TimeObserver;
 
+/// Workaround from https://github.com/DioxusLabs/dioxus/issues/4114
+fn schedule_update_fixed() -> Arc<dyn Fn() + Send + Sync + 'static> {
+    let subscribers: Arc<std::sync::Mutex<std::collections::HashSet<ReactiveContext>>> =
+        Default::default();
+
+    if let Some(reactive_context) = ReactiveContext::current() {
+        reactive_context.subscribe(subscribers.clone());
+    }
+
+    let callback = move || {
+        for reactive_context in subscribers.lock().unwrap().iter() {
+            reactive_context.mark_dirty();
+        }
+    };
+    Arc::new(callback)
+}
+
 /// Provide a callback access to the current time,
 /// and schedule an dioxus update for when what was observed about the time will change.
-pub fn use_time<T, F: FnOnce(&mut TimeObserver) -> T>(f: F) -> T {
+pub fn observe_time<T, F: FnOnce(&mut TimeObserver) -> T>(f: F) -> T {
     let now = Local::now();
-    let mut signal = use_signal(|| now);
-    // Suppress future updates for deadlines that have already passed.
-    *signal.write_silent() = now;
-
-    // Indicate a dependency on this signal so writing to it can be used to trigger an update.
-    signal.read();
-
     let mut observer = TimeObserver::new(now);
     let result = f(&mut observer);
 
     if let Some(deadline) = observer.into_deadline() {
-        // TODO: It seems like this should work:
-        // let update = schedule_update();
-        // However using that doesn't cancel the timeout after the context is rerendered, causing multiple timeouts to accumulate, each triggering more timeouts.
-        // There should be some way to fix this that doesn't require making a signal to deduplicate timeouts.
-        // If the need for a signal is removed, then `use_time` could stop being a hook and renamed to something like `observe_time`.
-
-        let mut update = move || {
-            let now = Local::now();
-            let last_time = signal.try_peek().map(|t| *t);
-            if let Ok(last_time) = last_time {
-                if last_time < deadline {
-                    dioxus::logger::tracing::trace!("wake");
-                    signal.set(now);
-                }
-            }
-        };
+        let update = schedule_update_fixed();
 
         #[cfg(target_arch = "wasm32")]
         if (deadline - now) <= chrono::TimeDelta::milliseconds(50) {
             dioxus::logger::tracing::trace!("do animation");
             use wasm_bindgen::{closure, JsCast};
-            let closure = closure::Closure::once_into_js(update);
+            let closure = closure::Closure::once_into_js(move || update());
             let window = web_sys::window().expect("no global `window` exists");
             window
                 .request_animation_frame(closure.as_ref().unchecked_ref())
@@ -49,13 +44,12 @@ pub fn use_time<T, F: FnOnce(&mut TimeObserver) -> T>(f: F) -> T {
             return result;
         }
 
-        // TODO: For platforms other than wasm32, implement some animation/update throttling.
-
         spawn(async move {
             sleep_until(deadline).await;
             update();
         });
     }
+
     result
 }
 

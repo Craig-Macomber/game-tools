@@ -2,18 +2,18 @@ use chrono::{Duration, Local};
 use dioxus::prelude::*;
 use dioxus_markdown::Markdown;
 
-use crate::LogItem;
+use crate::{view::dioxus_time::observe_time, LogItem};
 
 use std::vec;
 
-use super::super::{dioxus_time::use_time, time_observer::TimeObserver};
+use super::super::time_observer::TimeObserver;
 
 /**
  * Display log item.
  */
 #[component]
 pub(crate) fn LogItemView(item: LogItem) -> Element {
-    use_time(|t| {
+    observe_time(|t| {
         // TODO: this should probably use CSS animation for better efficiency.
         let fade = t.lerp(item.timestamp, item.timestamp + Duration::seconds(1), 0.002);
         let time = format_relative_time(item.timestamp, t);
