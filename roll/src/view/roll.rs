@@ -43,7 +43,11 @@ pub(crate) fn Rollers(lines: String) -> Element {
     rsx!(
         h2 { "Roll:" }
         div { id: "Roll-Content",
-            Markdown { src: markdown.join("\n"), components }
+            Markdown {
+                src: markdown.join("\n"),
+                components,
+                preserve_html: false,
+            }
         }
     )
 }
@@ -121,7 +125,7 @@ pub fn Roll(spec: String) -> Element {
         Err(d) => rsx!(
             // Not a valid roll, so display as Markdown, but include error from Roller as hover text incase it was intended to be a roll button.
             span { title: "{d}",
-                Markdown { src: "{spec}" }
+                Markdown { src: "{spec}", preserve_html: false }
             }
         ),
     }

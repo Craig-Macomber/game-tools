@@ -8,12 +8,12 @@ license = "MIT"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-dioxus = { version = "0.6.3", features = [] }
+dioxus = { version = "0.7.0", features = [] }
 # dioxus-sdk = { version = "0.6.0", features = ["storage"] }
 # Has a fix for https://github.com/Geobert/caith/issues/5
 caith = { git = "https://github.com/Craig-Macomber/caith", branch = "cleanup" }
 # Disable default features to opt out of "math" since it is not supported on desktop builds
-dioxus-markdown = { git = "https://github.com/Craig-Macomber/rust-web-markdown", rev = "89a4482ffecac9d2c03ada93a44a56ba9c825264", default-features = false }
+dioxus-markdown = { git = "https://github.com/Craig-Macomber/rust-web-markdown", rev = "e06e3f117c8c26f1f90a6802d85c4c69b2ff9a0e", default-features = false }
 chrono = { version = "0.4", features = ["now", "wasmbind", "serde"] }
 # async-std supports sleep/delay/timeout on wasm-unknown while tokio does not.
 async-std = { version = "1.13" }

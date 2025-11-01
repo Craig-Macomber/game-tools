@@ -35,13 +35,9 @@ pub(crate) fn Body() -> Element {
                     multiple: false,
                     onchange: move |evt| {
                         async move {
-                            if let Some(file_engine) = evt.files() {
-                                let files = file_engine.files();
-                                for file_name in &files {
-                                    if let Some(file) = file_engine.read_file_to_string(file_name).await
-                                    {
-                                        state.write().borrow_mut().lines = file;
-                                    }
+                            for file in evt.files() {
+                                if let Ok(file) = file.read_string().await {
+                                    state.write().borrow_mut().lines = file;
                                 }
                             }
                         }

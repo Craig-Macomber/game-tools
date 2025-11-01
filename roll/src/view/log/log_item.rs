@@ -24,7 +24,7 @@ pub(crate) fn LogItemView(item: LogItem) -> Element {
                 title: "{format_relative_time(item.timestamp, t)}",
                 opacity: fade,
                 span { class: "timestamp", "{time}" }
-                Markdown { src: "{item.markdown}" }
+                Markdown { src: "{item.markdown}", preserve_html: false }
             }
         )
     })
