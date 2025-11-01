@@ -15,6 +15,14 @@ use crate::{Log, LogItem};
  */
 #[component]
 pub(crate) fn LogView() -> Element {
+    // The custom storage logic is similar to https://docs.rs/dioxus-sdk/0.6.0/dioxus_sdk/storage/fn.use_synced_storage.html
+    // but with a few differences:
+    // 1. Uses a human readable format (pretty printed JSON instead of compressed postcard)
+    // 2. Supports fully removing/cleating the storage.
+    // 3. Only supports wasm/browser.
+    //
+    // TODO:
+    // Integrate with with Dioxus's storage system: https://github.com/DioxusLabs/sdk/pull/85
     rsx!(
         h2 { "Log:" }
         LogStorage {}
