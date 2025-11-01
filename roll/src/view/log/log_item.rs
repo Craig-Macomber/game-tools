@@ -36,6 +36,8 @@ fn format_relative_time(to_format: chrono::DateTime<Local>, now: &mut TimeObserv
         return to_format.format("%c").to_string();
     }
 
+    let days_ago = -now.days_after_now(to_format);
+    // It's possible to avoid reading this for things over a day old, but not worth complexity of the optimization.
     let hours_ago = -now.hours_after_now(to_format);
 
     let time_string = if hours_ago > 8 {
@@ -47,7 +49,9 @@ fn format_relative_time(to_format: chrono::DateTime<Local>, now: &mut TimeObserv
     };
 
     // TODO: would be nice to use some concise relative time utility here with localization support.
-    let ago_string = if hours_ago > 1 {
+    let ago_string = if days_ago > 1 {
+        format!("{days_ago} days ago")
+    } else if hours_ago > 1 {
         format!("{hours_ago} hours ago")
     } else {
         let minutes_ago = -now.minutes_after_now(to_format);

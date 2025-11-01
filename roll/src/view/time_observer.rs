@@ -29,6 +29,17 @@ impl TimeObserver {
         }
     }
 
+    /// How far in the future is `t` in days.
+    ///
+    /// Rounded toward zero.
+    pub fn days_after_now(&mut self, t: DateTime<Local>) -> i64 {
+        let delta = t - self.now;
+        let days = delta.num_days();
+        let wake = delta - TimeDelta::days(if days > 0 { days } else { days - 1 });
+        self.wake(wake);
+        days
+    }
+
     /// How far in the future is `t` in hours.
     ///
     /// Rounded toward zero.
