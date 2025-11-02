@@ -4,8 +4,8 @@
 name = "Roller"
 
 # Set the out_dir as documented in https://dioxuslabs.com/learn/0.6/cookbook/publishing
-# This does not work, nor does passing --outdir to "dx bundle".
-# out_dir = "docs"
+# This still includes the extra "public" folder, so this is not used, and instead the content is copied from its default location.
+# out_dir = "../docs"
 
 [web.app]
 

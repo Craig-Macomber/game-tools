@@ -18,9 +18,6 @@ fi
 # Ensure tests pass
 cargo test
 
-# Web release build
-# wasm-pack build --target web
-
 # Build for web
 dx bundle --package roll --release
 
@@ -28,7 +25,7 @@ dx bundle --package roll --release
 git branch -d pages
 git checkout -b pages
 
-# Path set by out_path in roll/Dioxus.toml does not work, so move the build manually:
+# Copy build to location expected by github pages:
 cp -r ./target/dx/roll/release/web/public/* ./docs
 
 cargo about generate about.hbs > docs/license.html
