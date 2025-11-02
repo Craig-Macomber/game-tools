@@ -1,10 +1,10 @@
-use caith::Roller;
+use caith::{Roller, SingleRoller};
 use dioxus::prelude::*;
 use dioxus_markdown::{CustomComponents, Markdown};
 
 use crate::{view::log::LOG, LogItem};
 
-use std::{fmt::format, ops::Deref, vec};
+use std::{ops::Deref, vec};
 
 /**
  * Rendered markdown results with inline rollers that put their result in "Log".
@@ -139,13 +139,17 @@ fn validate_roller(spec: &str) -> Result<Roller, Element> {
 
     match dummy_roll {
         Ok(_) => Ok(roller),
-        Err(d) => Err(rsx!(
-            // Not a valid roll, so display as Markdown, but include error from Roller as hover text incase it was intended to be a roll button.
-            span { title: "{d}",
-                Markdown { src: "{spec}", preserve_html: false }
-            }
-        )),
+        Err(error) => Err(roll_error(error, spec)),
     }
+}
+
+fn roll_error(error: caith::RollError, spec: &str) -> Element {
+    rsx!(
+        // Not a valid roll, so display as Markdown, but include error from Roller as hover text incase it was intended to be a roll button.
+        span { title: "{error}",
+            Markdown { src: "{spec}", preserve_html: false }
+        }
+    )
 }
 
 fn get_dice_string(roll: &caith::SingleRollResult) -> String {
@@ -158,37 +162,37 @@ fn get_dice_string(roll: &caith::SingleRollResult) -> String {
  */
 #[component]
 pub fn Attack(modifier: String, damage_dice: String, damage_fixed: String) -> Element {
-    let modifier_roller = match validate_roller(&modifier) {
+    let modifier_roller = match SingleRoller::new(&modifier) {
         Ok(roller) => roller,
         Err(error) => {
             return rsx!(
                 span {
                     "Invalid modifier specification"
-                    {error}
+                    {roll_error(error, &modifier)}
                 }
             );
         }
     };
 
-    let damage_dice_roller = match validate_roller(&damage_dice) {
+    let damage_dice_roller = match SingleRoller::new(&damage_dice) {
         Ok(roller) => roller,
         Err(error) => {
             return rsx!(
                 span {
                     "Invalid damage dice specification"
-                    {error}
+                    {roll_error(error, &damage_dice)}
                 }
             );
         }
     };
 
-    let damage_fixed_roller = match validate_roller(&damage_fixed) {
+    let damage_fixed_roller = match SingleRoller::new(&damage_fixed) {
         Ok(roller) => roller,
         Err(error) => {
             return rsx!(
                 span {
                     "Invalid damage fixed specification"
-                    {error}
+                    {roll_error(error, &damage_fixed)}
                 }
             );
         }
@@ -198,50 +202,31 @@ pub fn Attack(modifier: String, damage_dice: String, damage_fixed: String) -> El
     let advantage = "2d20K1";
     let disadvantage = "2d20k1";
 
-    fn roll(attack: &str, modifier: &Roller, damage_dice: &Roller, damage_fixed: &Roller) {
-        let attack_roller = Roller::new(attack).unwrap();
-        let attack_roll_result = attack_roller.roll().unwrap();
-        let attack_roll = attack_roll_result.as_single().unwrap();
+    fn roll(
+        attack: &str,
+        modifier: &SingleRoller,
+        damage_dice: &SingleRoller,
+        damage_fixed: &SingleRoller,
+    ) {
+        let attack_roller = SingleRoller::new(attack).unwrap();
+        let attack_roll = attack_roller.roll();
 
-        let modifier = if let Some(single) = modifier.roll().unwrap().as_single() {
-            single.get_total()
-        } else {
-            LOG.write()
-                .log
-                .push(LogItem::new("Invalid modifier".to_string()));
-            return;
-        };
+        let modifier = modifier.roll().get_total();
 
         let attack = attack_roll.get_total() + modifier;
 
-        let damage_dice_roll_result = damage_dice.roll().unwrap();
-        let damage_dice_roll = if let Some(single) = damage_dice_roll_result.as_single() {
-            single
-        } else {
-            LOG.write()
-                .log
-                .push(LogItem::new("Invalid damage_dice".to_string()));
-            return;
-        };
+        let damage_dice_roll = damage_dice.roll();
 
-        let damage_fixed = if let Some(single) = damage_fixed.roll().unwrap().as_single() {
-            single.get_total()
-        } else {
-            LOG.write()
-                .log
-                .push(LogItem::new("Invalid damage_fixed".to_string()));
-            return;
-        };
+        let damage_fixed = damage_fixed.roll().get_total();
 
-        let attack_string = get_dice_string(attack_roll);
-        let damage_string = get_dice_string(damage_dice_roll);
+        let attack_string = get_dice_string(&attack_roll);
+        let damage_string = get_dice_string(&damage_dice_roll);
         let damage_total = damage_dice_roll.get_total() + damage_fixed;
 
         LOG.write().log.push(LogItem::new(
             if attack_roll.get_total() == 20 {
-                let damage_dice_roll_result = damage_dice.roll().unwrap();
-                let damage_dice_roll_2 =  damage_dice_roll_result.as_single().unwrap();
-                let damage_string_2 = get_dice_string(damage_dice_roll_2);
+                let damage_dice_roll_2 = damage_dice.roll();
+                let damage_string_2 = get_dice_string(&damage_dice_roll_2);
                 let damage_total = damage_total + damage_dice_roll_2.get_total();
                 format!("**Crit** {attack_string} | Damage: ({damage_string}) + ({damage_string_2}) + {damage_fixed} = **{damage_total}**")
             } else if  attack_roll.get_total() == 1 {
