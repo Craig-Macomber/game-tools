@@ -4,6 +4,8 @@
 
 h1 {
     margin: 1rem;
+    margin-bottom: 0.15rem;
+    margin-top: 0.2rem
 }
 
 
@@ -33,7 +35,7 @@ h6 {
 
 .column {
     width: 33.33%;
-    padding: 10px;
+    padding: 5px;
     flex-direction: column;
     display: flex;
     flex-grow: 1;
@@ -44,13 +46,14 @@ h6 {
     display: flex;
     justify-content: space_around;
     background-color: #eee;
-    padding: 0.5rem;
+    padding: 0.1rem;
     flex-wrap: wrap;
+    align-items: center;
 }
 
 .bar-item {
     flex-grow: 1;
-    padding: 0.5rem;
+    padding: 0.1rem;
 }
 
 .message p {

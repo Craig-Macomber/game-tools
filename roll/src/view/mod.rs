@@ -20,34 +20,51 @@ pub(crate) fn Body() -> Element {
     let lines2 = lines.clone();
 
     rsx!(
-        h1 { "Roller" }
         div { class: "bar",
             span { class: "bar-item",
-                button { onclick: move |_| { save_url(&state.read().lines) }, "Save to URL" }
+                h1 { "Roller" }
             }
-            Storage {}
             span { class: "bar-item",
-                span { "Load File: " }
-                input {
-                    r#type: "file",
-                    directory: false,
-                    accept: ".txt",
-                    multiple: false,
-                    onchange: move |evt| {
-                        async move {
-                            for file in evt.files() {
-                                if let Ok(file) = file.read_string().await {
-                                    state.write().borrow_mut().lines = file;
-                                }
-                            }
-                        }
-                    },
-                }
+                a { href: "https://github.com/Craig-Macomber/game-tools", "Source code" }
+            }
+            span { class: "bar-item",
+                a { href: "/license.html", "Open source usage attributions" }
+            }
+            span { class: "bar-item",
+                a { href: "/known-issues.html", "Known issues" }
+            }
+            span { class: "bar-item",
+                a { href: "/data.html", "Data" }
             }
         }
+
         div { class: "row",
             div { class: "column",
                 h2 { style: "flex: 0;", "Edit:" }
+                div { class: "bar",
+                    span { class: "bar-item",
+                        button { onclick: move |_| { save_url(&state.read().lines) }, "Save to URL" }
+                    }
+                    Storage {}
+                    span { class: "bar-item",
+                        span { "Load File: " }
+                        input {
+                            r#type: "file",
+                            directory: false,
+                            accept: ".txt",
+                            multiple: false,
+                            onchange: move |evt| {
+                                async move {
+                                    for file in evt.files() {
+                                        if let Ok(file) = file.read_string().await {
+                                            state.write().borrow_mut().lines = file;
+                                        }
+                                    }
+                                }
+                            },
+                        }
+                    }
+                }
                 span {
                     "Syntax: "
                     a { href: "https://commonmark.org/help/", "Markdown" }
@@ -76,20 +93,6 @@ pub(crate) fn Body() -> Element {
                 Rollers { lines: lines2 }
             }
             div { class: "column", id: "Log", LogView {} }
-        }
-        div { class: "bar",
-            span { class: "bar-item",
-                a { href: "https://github.com/Craig-Macomber/game-tools", "Source code" }
-            }
-            span { class: "bar-item",
-                a { href: "/license.html", "Open source usage attributions" }
-            }
-            span { class: "bar-item",
-                a { href: "/known-issues.html", "Known issues" }
-            }
-            span { class: "bar-item",
-                a { href: "/data.html", "Data" }
-            }
         }
     )
 }
