@@ -22,7 +22,7 @@ cargo test
 # wasm-pack build --target web
 
 # Build for web
-dx bundle --package roll
+dx bundle --package roll --release
 
 # Regenerate the pages branch from the current one
 git branch -d pages
