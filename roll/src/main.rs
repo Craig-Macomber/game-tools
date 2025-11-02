@@ -110,6 +110,14 @@ static DEFAULT_TEXT: &'static str = r#"# Examples:
 **Stab:** <Roll d="1d20+5"/> to hit dealing <Roll d="2d6"/> on hit.
 
 **Other:** <Roll d="1d20+5"/> to hit dealing <Roll d="2d6"/> **cold** damage on hit.
+
+# Custom Tags
+
+## Attack
+<A m="5" d="2d6 + 1d8" f="2"/>
+
+## Counter:
+Health: <Counter initial="20"/>
 "#;
 
 #[cfg(target_arch = "wasm32")]
