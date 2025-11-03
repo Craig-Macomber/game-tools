@@ -228,11 +228,11 @@ pub fn Attack(modifier: String, damage_dice: String, damage_fixed: String) -> El
                 let damage_dice_roll_2 = damage_dice.roll();
                 let damage_string_2 = get_dice_string(&damage_dice_roll_2);
                 let damage_total = damage_total + damage_dice_roll_2.get_total();
-                format!("**Crit** {attack_string} | Damage: ({damage_string}) + ({damage_string_2}) + {damage_fixed} = **{damage_total}**")
+                format!("**Crit** {attack_string} *Damage*: **{damage_total}** = ({damage_string}) + ({damage_string_2}) + {damage_fixed}")
             } else if  attack_roll.get_total() == 1 {
                 format!("**Crit Miss** {attack_string}")
             } else {
-                format!("Attack {attack_string} + {modifier} = **{attack}** | Damage: ({damage_string}) + {damage_fixed} = **{damage_total}**")
+                format!("*To Hit*: **{attack}** = {attack_string} + {modifier} *Damage*: **{damage_total}** = ({damage_string}) + {damage_fixed}")
             }
         ));
     }
@@ -250,14 +250,14 @@ pub fn Attack(modifier: String, damage_dice: String, damage_fixed: String) -> El
                 onclick: move |_| {
                     roll(disadvantage, &modifier_roller, &damage_dice_roller, &damage_fixed_roller);
                 },
-                "-"
+                b {"-"}
             }
             button {
                 class: "roll-button",
                 onclick: move |_| {
                     roll(regular, &modifier_roller_2, &damage_dice_roller_2, &damage_fixed_roller_2);
                 },
-                "Attack: 1d20 + {modifier} | Damage: {damage_dice} + {damage_fixed}"
+                span {b {"1d20 + {modifier}"}" to hit for " b{"{damage_dice} + {damage_fixed}"}" damage"}
             }
             button {
                 class: "roll-button",
@@ -269,7 +269,7 @@ pub fn Attack(modifier: String, damage_dice: String, damage_fixed: String) -> El
                         &damage_fixed_roller_3,
                     );
                 },
-                "+"
+                b {"+"}
             }
         }
     )
