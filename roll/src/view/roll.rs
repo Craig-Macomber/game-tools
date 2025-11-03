@@ -85,7 +85,7 @@ fn Counter(initial: i32) -> Element {
     let mut count = use_signal(|| initial);
 
     rsx! {
-        div {
+        span {
             button { onclick: move |_| count -= 1, "-" }
             "{count}"
             button { onclick: move |_| count += 1, "+" }
