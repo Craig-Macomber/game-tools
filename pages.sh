@@ -22,7 +22,7 @@ cargo test
 dx bundle --package roll --release
 
 # Regenerate the pages branch from the current one
-git branch -d pages
+git branch -D pages
 git checkout -b pages
 
 # Copy build to location expected by github pages:
