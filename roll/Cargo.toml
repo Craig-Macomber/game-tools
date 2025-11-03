@@ -19,6 +19,7 @@ chrono = { version = "0.4", features = ["now", "wasmbind", "serde"] }
 async-std = { version = "1.13" }
 serde_json = "1.0.140"
 serde = "1.0.219"
+dioxus-primitives = { git = "https://github.com/DioxusLabs/components", rev = "8e25631c7d4234ee070509156ed2abebb7b1d6e9" }
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 # caith pulls in "getrandom" which needs custom features to support WASM:

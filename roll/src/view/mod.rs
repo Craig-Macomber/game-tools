@@ -8,7 +8,10 @@ use std::borrow::BorrowMut;
 pub mod dioxus_time;
 mod log;
 mod roll;
+mod syntax;
 pub mod time_observer;
+
+use syntax::Syntax;
 
 #[component]
 pub(crate) fn Body() -> Element {
@@ -65,20 +68,8 @@ pub(crate) fn Body() -> Element {
                         }
                     }
                 }
-                span {
-                    "Syntax: "
-                    a { href: "https://commonmark.org/help/", "Markdown" }
-                    " with "
-                    a { href: "https://github.com/Geobert/caith?tab=readme-ov-file#syntax",
-                        "Caith dice notation"
-                    }
-                    "."
-                }
-                span {
-                    "Dice notation can be on its own line or in a "
-                    i { style: "white-space: nowrap;", "<Roll d=\"dice here\"/>" }
-                    " tag."
-                }
+                Syntax {}
+
                 textarea {
                     style: "flex-grow: 1;",
                     value: "{lines}",
