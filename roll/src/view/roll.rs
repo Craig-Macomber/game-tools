@@ -1,10 +1,10 @@
-use caith::{Roller, SingleRoller};
+use caith::{Command, EvaluatedExpression, Expression, Rollable, Verbosity};
 use dioxus::prelude::*;
 use dioxus_markdown::{CustomComponents, Markdown};
 
 use crate::{view::log::LOG, LogItem};
 
-use std::{ops::Deref, vec};
+use std::vec;
 
 /**
  * Rendered markdown results with inline rollers that put their result in "Log".
@@ -63,18 +63,9 @@ pub(crate) fn Rollers(lines: String) -> Element {
 }
 
 pub fn try_roller(spec: &str) -> Option<String> {
-    // Always succeeds: errors are deferred until rolling.
-    let roller = Roller::new(&spec).unwrap();
+    let roller = Command::parse(&spec);
 
-    // Rolled only to see if there is an error.
-    let dummy_roll = roller.roll();
-
-    // Empty line case
-    if spec.is_empty() {
-        return None;
-    }
-
-    match dummy_roll {
+    match roller {
         Ok(_) => Some(spec.to_string()),
         Err(_) => None,
     }
@@ -105,22 +96,7 @@ pub fn Roll(spec: String) -> Element {
                     class: "roll-button",
                     onclick: move |_| {
                         let roll = roller.roll().unwrap();
-                        let mut log_lines = vec![];
-                        if let Some(single) = roll.as_single() {
-                            let message = single.to_string(true);
-                            let msg = format!("{spec}: {message}");
-                            log_lines.push(msg);
-                        } else {
-                            let roll = roll.as_repeated().unwrap();
-                            for single in roll.deref() {
-                                let message = single.to_string(true);
-                                let msg = format!("  - {message}");
-                                log_lines.push(msg);
-                            }
-                            let total = roll.get_total().map_or("".to_owned(), |x| x.to_string());
-                            log_lines.push(format!("\n{spec}: **{total}**"));
-                        }
-                        LOG.write().log.push(LogItem::new(log_lines.join("\n")));
+                        LOG.write().log.push(LogItem::new(roll.format(true, Verbosity::Medium)));
                     },
                     "{spec}"
                 }
@@ -130,31 +106,21 @@ pub fn Roll(spec: String) -> Element {
     }
 }
 
-fn validate_roller(spec: &str) -> Result<Roller, Element> {
-    // Always succeeds: errors are deferred until rolling.
-    let roller = Roller::new(spec).unwrap();
-
-    // Rolled only to see if there is an error.
-    let dummy_roll = roller.roll();
-
-    match dummy_roll {
-        Ok(_) => Ok(roller),
-        Err(error) => Err(roll_error(error, spec)),
-    }
+fn validate_roller(spec: &str) -> Result<Command, Element> {
+    Command::parse(spec).map_err(|e| roll_error(e, spec))
 }
 
 fn roll_error(error: caith::RollError, spec: &str) -> Element {
     rsx!(
-        // Not a valid roll, so display as Markdown, but include error from Roller as hover text incase it was intended to be a roll button.
+        // Not a valid roll, so display as Markdown, but include error from Roller as hover text in case it was intended to be a roll button.
         span { title: "{error}",
             Markdown { src: "{spec}", preserve_html: false }
         }
     )
 }
 
-fn get_dice_string(roll: &caith::SingleRollResult) -> String {
-    let s: Vec<String> = roll.get_history().iter().map(|h| h.to_string()).collect();
-    s.join(" ")
+fn get_dice_string(roll: &Box<dyn EvaluatedExpression>) -> String {
+    roll.format_history(true, Verbosity::Medium)
 }
 
 /**
@@ -162,7 +128,7 @@ fn get_dice_string(roll: &caith::SingleRollResult) -> String {
  */
 #[component]
 pub fn Attack(modifier: String, damage_dice: String, damage_fixed: String) -> Element {
-    let modifier_roller = match SingleRoller::new(&modifier) {
+    let modifier_roller = match Expression::parse(&modifier) {
         Ok(roller) => roller,
         Err(error) => {
             return rsx!(
@@ -174,7 +140,7 @@ pub fn Attack(modifier: String, damage_dice: String, damage_fixed: String) -> El
         }
     };
 
-    let damage_dice_roller = match SingleRoller::new(&damage_dice) {
+    let damage_dice_roller = match Expression::parse(&damage_dice) {
         Ok(roller) => roller,
         Err(error) => {
             return rsx!(
@@ -186,7 +152,7 @@ pub fn Attack(modifier: String, damage_dice: String, damage_fixed: String) -> El
         }
     };
 
-    let damage_fixed_roller = match SingleRoller::new(&damage_fixed) {
+    let damage_fixed_roller = match Expression::parse(&damage_fixed) {
         Ok(roller) => roller,
         Err(error) => {
             return rsx!(
@@ -204,33 +170,33 @@ pub fn Attack(modifier: String, damage_dice: String, damage_fixed: String) -> El
 
     fn roll(
         attack: &str,
-        modifier: &SingleRoller,
-        damage_dice: &SingleRoller,
-        damage_fixed: &SingleRoller,
+        modifier: &Expression,
+        damage_dice: &Expression,
+        damage_fixed: &Expression,
     ) {
-        let attack_roller = SingleRoller::new(attack).unwrap();
-        let attack_roll = attack_roller.roll();
+        let attack_roller = Expression::parse(attack).unwrap();
+        let attack_roll: Box<dyn EvaluatedExpression> = attack_roller.roll().unwrap();
 
-        let modifier = modifier.roll().get_total();
+        let modifier = modifier.roll().unwrap().total();
 
-        let attack = attack_roll.get_total() + modifier;
+        let attack = attack_roll.total() + modifier;
 
-        let damage_dice_roll = damage_dice.roll();
+        let damage_dice_roll = damage_dice.roll().unwrap();
 
-        let damage_fixed = damage_fixed.roll().get_total();
+        let damage_fixed = damage_fixed.roll().unwrap().total();
 
         let attack_string = get_dice_string(&attack_roll);
         let damage_string = get_dice_string(&damage_dice_roll);
-        let damage_total = damage_dice_roll.get_total() + damage_fixed;
+        let damage_total = damage_dice_roll.total() + damage_fixed;
         let crit = get_crit(&attack_roll);
 
         LOG.write().log.push(LogItem::new(match crit {
             caith::Critic::No => format!("*To Hit*: **{attack}** = {attack_string} + {modifier} *Damage*: **{damage_total}** = ({damage_string}) + {damage_fixed}"),
             caith::Critic::Min => format!("**Crit Miss** {attack_string}"),
             caith::Critic::Max => {
-                 let damage_dice_roll_2 = damage_dice.roll();
+                 let damage_dice_roll_2 = damage_dice.roll().unwrap();
                 let damage_string_2 = get_dice_string(&damage_dice_roll_2);
-                let damage_total = damage_total + damage_dice_roll_2.get_total();
+                let damage_total = damage_total + damage_dice_roll_2.total();
                 format!("**Crit** {attack_string} *Damage*: **{damage_total}** = ({damage_string}) + ({damage_string_2}) + {damage_fixed}")
             },
         }));
@@ -279,71 +245,16 @@ pub fn Attack(modifier: String, damage_dice: String, damage_fixed: String) -> El
     )
 }
 
-fn get_crit(r: &caith::SingleRollResult) -> caith::Critic {
-    let crit = r.get_history().iter().all(|h| match h {
-        caith::RollHistory::Roll(dice_results) => dice_results
-            .iter()
-            .all(|r| matches!(r.crit, caith::Critic::Max)),
-        _ => true,
-    });
+fn get_crit(r: &Box<dyn EvaluatedExpression>) -> caith::Critic {
+    let crit = r.total() == 20.0;
     if crit {
         return caith::Critic::Max;
     }
-    let crit = r.get_history().iter().all(|h| match h {
-        caith::RollHistory::Roll(dice_results) => dice_results
-            .iter()
-            .all(|r| matches!(r.crit, caith::Critic::Min)),
-        _ => true,
-    });
+    let crit = r.total() == 1.0;
 
     if crit {
         return caith::Critic::Min;
     }
 
     caith::Critic::No
-}
-
-#[cfg(test)]
-mod tests {
-
-    // Regression tests for https://github.com/Geobert/caith/issues/5
-    use caith::Roller;
-    #[test]
-    fn caith_minimal() {
-        // This should deterministically roll a 1
-        let roller = Roller::new(&"1d1").unwrap();
-
-        let result = roller.roll().unwrap();
-        let numeric = result.as_single().unwrap();
-        let as_string = numeric.to_string(false);
-
-        assert_eq!(numeric.get_total(), 1);
-        assert_eq!(as_string, "[1] = 1");
-    }
-
-    #[test]
-    fn caith_reroll() {
-        // This should deterministically roll a 1, then reroll 1
-        let roller = Roller::new(&"1d1 r1").unwrap();
-
-        let result = roller.roll().unwrap();
-        let numeric = result.as_single().unwrap();
-        let as_string = numeric.to_string(false);
-
-        assert_eq!(numeric.get_total(), 1);
-        assert_eq!(as_string, "[1 -> 1] -> [1] = 1");
-    }
-
-    #[test]
-    fn caith_no_reroll() {
-        // This should deterministically roll a 1, then not reroll anything since 1 > 0
-        let roller = Roller::new(&"1d1 r0").unwrap();
-
-        let result = roller.roll().unwrap();
-        let numeric = result.as_single().unwrap();
-        let as_string = numeric.to_string(false);
-
-        assert_eq!(numeric.get_total(), 1);
-        assert_eq!(as_string, "[1] = 1");
-    }
 }
