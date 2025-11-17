@@ -222,19 +222,18 @@ pub fn Attack(modifier: String, damage_dice: String, damage_fixed: String) -> El
         let attack_string = get_dice_string(&attack_roll);
         let damage_string = get_dice_string(&damage_dice_roll);
         let damage_total = damage_dice_roll.get_total() + damage_fixed;
+        let crit = get_crit(&attack_roll);
 
-        LOG.write().log.push(LogItem::new(
-            if attack_roll.get_total() == 20 {
-                let damage_dice_roll_2 = damage_dice.roll();
+        LOG.write().log.push(LogItem::new(match crit {
+            caith::Critic::No => format!("*To Hit*: **{attack}** = {attack_string} + {modifier} *Damage*: **{damage_total}** = ({damage_string}) + {damage_fixed}"),
+            caith::Critic::Min => format!("**Crit Miss** {attack_string}"),
+            caith::Critic::Max => {
+                 let damage_dice_roll_2 = damage_dice.roll();
                 let damage_string_2 = get_dice_string(&damage_dice_roll_2);
                 let damage_total = damage_total + damage_dice_roll_2.get_total();
                 format!("**Crit** {attack_string} *Damage*: **{damage_total}** = ({damage_string}) + ({damage_string_2}) + {damage_fixed}")
-            } else if  attack_roll.get_total() == 1 {
-                format!("**Crit Miss** {attack_string}")
-            } else {
-                format!("*To Hit*: **{attack}** = {attack_string} + {modifier} *Damage*: **{damage_total}** = ({damage_string}) + {damage_fixed}")
-            }
-        ));
+            },
+        }));
     }
 
     let modifier_roller_2 = modifier_roller.clone();
@@ -250,14 +249,19 @@ pub fn Attack(modifier: String, damage_dice: String, damage_fixed: String) -> El
                 onclick: move |_| {
                     roll(disadvantage, &modifier_roller, &damage_dice_roller, &damage_fixed_roller);
                 },
-                b {"-"}
+                b { "-" }
             }
             button {
                 class: "roll-button",
                 onclick: move |_| {
                     roll(regular, &modifier_roller_2, &damage_dice_roller_2, &damage_fixed_roller_2);
                 },
-                span {b {"1d20 + {modifier}"}" to hit for " b{"{damage_dice} + {damage_fixed}"}" damage"}
+                span {
+                    b { "1d20 + {modifier}" }
+                    " to hit for "
+                    b { "{damage_dice} + {damage_fixed}" }
+                    " damage"
+                }
             }
             button {
                 class: "roll-button",
@@ -269,10 +273,34 @@ pub fn Attack(modifier: String, damage_dice: String, damage_fixed: String) -> El
                         &damage_fixed_roller_3,
                     );
                 },
-                b {"+"}
+                b { "+" }
             }
         }
     )
+}
+
+fn get_crit(r: &caith::SingleRollResult) -> caith::Critic {
+    let crit = r.get_history().iter().all(|h| match h {
+        caith::RollHistory::Roll(dice_results) => dice_results
+            .iter()
+            .all(|r| matches!(r.crit, caith::Critic::Max)),
+        _ => true,
+    });
+    if crit {
+        return caith::Critic::Max;
+    }
+    let crit = r.get_history().iter().all(|h| match h {
+        caith::RollHistory::Roll(dice_results) => dice_results
+            .iter()
+            .all(|r| matches!(r.crit, caith::Critic::Min)),
+        _ => true,
+    });
+
+    if crit {
+        return caith::Critic::Min;
+    }
+
+    caith::Critic::No
 }
 
 #[cfg(test)]
