@@ -11,7 +11,7 @@ license = "MIT"
 dioxus = { version = "0.7.0", features = [] }
 # dioxus-sdk = { version = "0.6.0", features = ["storage"] }
 # Has a fix for https://github.com/Geobert/caith/issues/5
-caith = { git = "https://github.com/Craig-Macomber/caith", rev = "b7cbdd6323a89acd670a65fec50027c5abc37c0b" }
+caith = { git = "https://github.com/Craig-Macomber/caith", rev = "d5902bcb3c57d194f31c3dc730771b837458b5a0" }
 # Disable default features to opt out of "math" since it is not supported on desktop builds
 dioxus-markdown = { git = "https://github.com/Craig-Macomber/rust-web-markdown", rev = "e06e3f117c8c26f1f90a6802d85c4c69b2ff9a0e", default-features = false }
 chrono = { version = "0.4", features = ["now", "wasmbind", "serde"] }

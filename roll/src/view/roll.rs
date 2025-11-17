@@ -95,8 +95,12 @@ pub fn Roll(spec: String) -> Element {
                 button {
                     class: "roll-button",
                     onclick: move |_| {
-                        let roll = roller.roll().unwrap();
-                        LOG.write().log.push(LogItem::new(roll.format(true, Verbosity::Medium)));
+                        let roll = roller.roll();
+                        let message = match roll {
+                            Ok(roll) => roll.format(true, Verbosity::Medium),
+                            Err(err) => format!("{err}"),
+                        };
+                        LOG.write().log.push(LogItem::new(message));
                     },
                     "{spec}"
                 }
@@ -174,32 +178,46 @@ pub fn Attack(modifier: String, damage_dice: String, damage_fixed: String) -> El
         damage_dice: &Expression,
         damage_fixed: &Expression,
     ) {
-        let attack_roller = Expression::parse(attack).unwrap();
-        let attack_roll: Box<dyn EvaluatedExpression> = attack_roller.roll().unwrap();
+        let s = match roll_inner(attack, modifier, damage_dice, damage_fixed) {
+            Ok(s) => s,
+            Err(e) => format!("{e}"),
+        };
 
-        let modifier = modifier.roll().unwrap().total();
+        LOG.write().log.push(LogItem::new(s));
+    }
+
+    fn roll_inner(
+        attack: &str,
+        modifier: &Expression,
+        damage_dice: &Expression,
+        damage_fixed: &Expression,
+    ) -> caith::Result<String> {
+        let attack_roller = Expression::parse(attack)?;
+        let attack_roll: Box<dyn EvaluatedExpression> = attack_roller.roll()?;
+
+        let modifier = modifier.roll()?.total();
 
         let attack = attack_roll.total() + modifier;
 
-        let damage_dice_roll = damage_dice.roll().unwrap();
+        let damage_dice_roll = damage_dice.roll()?;
 
-        let damage_fixed = damage_fixed.roll().unwrap().total();
+        let damage_fixed = damage_fixed.roll()?.total();
 
         let attack_string = get_dice_string(&attack_roll);
         let damage_string = get_dice_string(&damage_dice_roll);
         let damage_total = damage_dice_roll.total() + damage_fixed;
         let crit = get_crit(&attack_roll);
 
-        LOG.write().log.push(LogItem::new(match crit {
+        Ok(match crit {
             caith::Critic::No => format!("*To Hit*: **{attack}** = {attack_string} + {modifier} *Damage*: **{damage_total}** = ({damage_string}) + {damage_fixed}"),
             caith::Critic::Min => format!("**Crit Miss** {attack_string}"),
             caith::Critic::Max => {
-                 let damage_dice_roll_2 = damage_dice.roll().unwrap();
+                 let damage_dice_roll_2 = damage_dice.roll()?;
                 let damage_string_2 = get_dice_string(&damage_dice_roll_2);
                 let damage_total = damage_total + damage_dice_roll_2.total();
                 format!("**Crit** {attack_string} *Damage*: **{damage_total}** = ({damage_string}) + ({damage_string_2}) + {damage_fixed}")
             },
-        }));
+        })
     }
 
     let modifier_roller_2 = modifier_roller.clone();
