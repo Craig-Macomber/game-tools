@@ -458,7 +458,7 @@ dependencies = [
 [[package]]
 name = "caith"
 version = "4.2.4"
-source = "git+https://github.com/Craig-Macomber/caith?rev=d5902bcb3c57d194f31c3dc730771b837458b5a0#d5902bcb3c57d194f31c3dc730771b837458b5a0"
+source = "git+https://github.com/Craig-Macomber/caith?rev=f42d5cf2b2523db62c007247db6f392dc308ba72#f42d5cf2b2523db62c007247db6f392dc308ba72"
 dependencies = [
  "pest",
  "pest_derive",
