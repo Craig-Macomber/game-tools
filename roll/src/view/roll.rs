@@ -94,6 +94,7 @@ pub fn Roll(spec: String) -> Element {
             rsx!(
                 button {
                     class: "roll-button",
+                    title: "{roller:?}",
                     onclick: move |_| {
                         let roll = roller.roll();
                         let message = match roll {
@@ -209,13 +210,13 @@ pub fn Attack(modifier: String, damage_dice: String, damage_fixed: String) -> El
         let crit = get_crit(&attack_roll);
 
         Ok(match crit {
-            caith::Critic::No => format!("*To Hit*: **{attack}** = {attack_string} + {modifier} *Damage*: **{damage_total}** = ({damage_string}) + {damage_fixed}"),
-            caith::Critic::Min => format!("**Crit Miss** {attack_string}"),
-            caith::Critic::Max => {
+            Critic::No => format!("*To Hit*: **{attack}** = {attack_string} + {modifier} *Damage*: **{damage_total}** = {damage_string} + {damage_fixed}"),
+            Critic::Min => format!("**Crit Miss** {attack_string}"),
+            Critic::Max => {
                  let damage_dice_roll_2 = damage_dice.roll()?;
                 let damage_string_2 = get_dice_string(&damage_dice_roll_2);
                 let damage_total = damage_total + damage_dice_roll_2.total();
-                format!("**Crit** {attack_string} *Damage*: **{damage_total}** = ({damage_string}) + ({damage_string_2}) + {damage_fixed}")
+                format!("**Crit** {attack_string} *Damage*: **{damage_total}** = {damage_string}) + {damage_string_2} + {damage_fixed}")
             },
         })
     }
@@ -263,16 +264,27 @@ pub fn Attack(modifier: String, damage_dice: String, damage_fixed: String) -> El
     )
 }
 
-fn get_crit(r: &Box<dyn EvaluatedExpression>) -> caith::Critic {
+fn get_crit(r: &Box<dyn EvaluatedExpression>) -> Critic {
     let crit = r.total() == 20.0;
     if crit {
-        return caith::Critic::Max;
+        return Critic::Max;
     }
     let crit = r.total() == 1.0;
 
     if crit {
-        return caith::Critic::Min;
+        return Critic::Min;
     }
 
-    caith::Critic::No
+    Critic::No
+}
+
+/// Used to mark a dice roll if its result is a critic.
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
+pub enum Critic {
+    /// Normal result
+    No,
+    /// Minimum reached
+    Min,
+    /// Maximum reached
+    Max,
 }
