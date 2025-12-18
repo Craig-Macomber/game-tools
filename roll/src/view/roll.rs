@@ -2,7 +2,7 @@ use caith::{Command, EvaluatedExpression, Expression, Rollable, Verbosity};
 use dioxus::prelude::*;
 use dioxus_markdown::{CustomComponents, Markdown};
 
-use crate::{view::log::LOG, LogItem};
+use crate::{LogItem, view::log::LOG};
 
 use std::vec;
 
@@ -210,14 +210,18 @@ pub fn Attack(modifier: String, damage_dice: String, damage_fixed: String) -> El
         let crit = get_crit(&attack_roll);
 
         Ok(match crit {
-            Critic::No => format!("*To Hit*: **{attack}** = {attack_string} + {modifier} *Damage*: **{damage_total}** = {damage_string} + {damage_fixed}"),
+            Critic::No => format!(
+                "*To Hit*: **{attack}** = {attack_string} + {modifier} *Damage*: **{damage_total}** = {damage_string} + {damage_fixed}"
+            ),
             Critic::Min => format!("**Crit Miss** {attack_string}"),
             Critic::Max => {
-                 let damage_dice_roll_2 = damage_dice.roll()?;
+                let damage_dice_roll_2 = damage_dice.roll()?;
                 let damage_string_2 = get_dice_string(&damage_dice_roll_2);
                 let damage_total = damage_total + damage_dice_roll_2.total();
-                format!("**Crit** {attack_string} *Damage*: **{damage_total}** = {damage_string}) + {damage_string_2} + {damage_fixed}")
-            },
+                format!(
+                    "**Crit** {attack_string} *Damage*: **{damage_total}** = {damage_string}) + {damage_string_2} + {damage_fixed}"
+                )
+            }
         })
     }
 

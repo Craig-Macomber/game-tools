@@ -2,7 +2,7 @@ use chrono::{Duration, Local};
 use dioxus::prelude::*;
 use dioxus_markdown::Markdown;
 
-use crate::{view::dioxus_time::observe_time, LogItem};
+use crate::{LogItem, view::dioxus_time::observe_time};
 
 use std::vec;
 

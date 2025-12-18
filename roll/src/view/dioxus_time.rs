@@ -35,7 +35,7 @@ pub fn observe_time<T, F: FnOnce(&mut TimeObserver) -> T>(f: F) -> T {
         #[cfg(target_arch = "wasm32")]
         if (deadline - now) <= chrono::TimeDelta::milliseconds(50) {
             dioxus::logger::tracing::trace!("do animation");
-            use wasm_bindgen::{closure, JsCast};
+            use wasm_bindgen::{JsCast, closure};
             let closure = closure::Closure::once_into_js(move || update());
             let window = web_sys::window().expect("no global `window` exists");
             window

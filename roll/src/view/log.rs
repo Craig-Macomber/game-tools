@@ -6,7 +6,7 @@ mod log_item;
 use std::{borrow::Borrow, vec};
 
 #[cfg(target_arch = "wasm32")]
-use crate::{load_storage, on_storage, save_storage, CallbackRetention};
+use crate::{CallbackRetention, load_storage, on_storage, save_storage};
 
 use crate::{Log, LogItem};
 

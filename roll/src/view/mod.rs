@@ -91,7 +91,7 @@ pub(crate) fn Body() -> Element {
 #[component]
 #[cfg(target_arch = "wasm32")]
 fn Storage() -> Element {
-    use crate::{load_storage, save_storage, STORAGE_KEY};
+    use crate::{STORAGE_KEY, load_storage, save_storage};
 
     let mut state = use_context::<Signal<State>>();
 
