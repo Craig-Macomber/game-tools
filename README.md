@@ -1,6 +1,6 @@
 # game-tools
 
-A collection tools intended for use when planing TTRPGs.
+A collection tools intended for use when playing TTRPGs.
 
 Implemented in Rust targeting the browser via WebAssembly, but also supports native builds.
 
