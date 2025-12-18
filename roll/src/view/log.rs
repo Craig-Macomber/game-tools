@@ -1,14 +1,16 @@
-use dioxus::{logger::tracing::trace, prelude::*};
-use serde::{Deserialize, Serialize};
-
-mod log_item;
-
+use dioxus::prelude::*;
 use std::{borrow::Borrow, vec};
 
 #[cfg(target_arch = "wasm32")]
-use crate::{CallbackRetention, load_storage, on_storage, save_storage};
+use crate::{CallbackRetention, LogItem, load_storage, on_storage, save_storage};
+#[cfg(target_arch = "wasm32")]
+use dioxus::logger::tracing::trace;
+#[cfg(target_arch = "wasm32")]
+use serde::{Deserialize, Serialize};
 
-use crate::{Log, LogItem};
+use crate::Log;
+
+mod log_item;
 
 /**
  * Display Log.
@@ -136,8 +138,15 @@ pub fn LoadButton() -> Element {
 }
 
 pub(crate) fn load_or_new_log(skip_load_message: bool) -> Log {
-    #[cfg(target_arch = "wasm32")]
-    if let Some(stored) = load_storage(LOG_STORAGE_KEY) {
+    try_load_log(skip_load_message).unwrap_or(Log {
+        sync: false,
+        log: Vec::default(),
+    })
+}
+
+#[cfg(target_arch = "wasm32")]
+fn try_load_log(skip_load_message: bool) -> Option<Log> {
+    load_storage(LOG_STORAGE_KEY).map(|stored| {
         trace!("Loading existing log from local storage!");
         let mut log = vec![];
 
@@ -154,18 +163,16 @@ pub(crate) fn load_or_new_log(skip_load_message: bool) -> Log {
             }
             Err(e) => log.push(LogItem::new(format!("Failed to parse stored log: {e}"))),
         }
-
-        return Log { sync, log };
-    }
-
-    trace!("Loading default log");
-
-    Log {
-        sync: false,
-        log: Vec::default(),
-    }
+        Log { sync, log }
+    })
 }
 
+#[cfg(not(target_arch = "wasm32"))]
+fn try_load_log(_skip_load_message: bool) -> Option<Log> {
+    None
+}
+
+#[cfg(target_arch = "wasm32")]
 #[derive(Serialize, Deserialize)]
 struct EncodedLog {
     log: Vec<LogItem>,
