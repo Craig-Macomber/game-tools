@@ -116,7 +116,6 @@ pub fn LoadButton() -> Element {
     if sync {
         rsx!(
             Button {
-                variant: ButtonVariant::Secondary,
                 onclick: move |_| {
                     LOG.write().sync = false;
                     #[cfg(target_arch = "wasm32")]
@@ -130,7 +129,6 @@ pub fn LoadButton() -> Element {
     } else {
         rsx!(
             Button {
-                variant: ButtonVariant::Secondary,
                 onclick: move |_| {
                     *LOG.write() = load_or_new_log(false);
                     LOG.write().sync = true;

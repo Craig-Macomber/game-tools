@@ -78,17 +78,9 @@ fn Counter(initial: i32) -> Element {
 
     rsx! {
         span {
-            Button {
-                variant: ButtonVariant::Secondary,
-                onclick: move |_| count -= 1,
-                "-"
-            }
+            Button { onclick: move |_| count -= 1, "-" }
             "{count}"
-            Button {
-                variant: ButtonVariant::Secondary,
-                onclick: move |_| count += 1,
-                "+"
-            }
+            Button { onclick: move |_| count += 1, "+" }
         }
     }
 }
@@ -102,7 +94,6 @@ pub fn Roll(spec: String) -> Element {
         Ok(roller) => {
             rsx!(
                 Button {
-                    variant: ButtonVariant::Secondary,
                     title: "{roller:?}",
                     onclick: move |_| {
                         let roll = roller.roll();
@@ -250,7 +241,6 @@ pub fn Attack(modifier: String, damage_dice: String, damage_fixed: String) -> El
                 b { "-" }
             }
             Button {
-                variant: ButtonVariant::Secondary,
                 onclick: move |_| {
                     roll(regular, &modifier_roller_2, &damage_dice_roller_2, &damage_fixed_roller_2);
                 },
