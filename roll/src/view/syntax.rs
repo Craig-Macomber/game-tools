@@ -24,8 +24,9 @@ pub fn Accordion(props: AccordionProps) -> Element {
 pub fn Syntax() -> Element {
     rsx! {
         Accordion {
+            allow_multiple_open: true,
             AccordionItem { index: 0, default_open: true,
-                AccordionTrigger { "Syntax" }
+                AccordionTrigger { h3 { "Syntax" } }
                 AccordionContent {
                     span {
                         a { href: "https://commonmark.org/help/", "Markdown" }
@@ -43,7 +44,7 @@ pub fn Syntax() -> Element {
                 }
             }
             AccordionItem { index: 2,
-                AccordionTrigger { "Tags" }
+                AccordionTrigger { h3 { "Tags" } }
                 AccordionContent {
                     span {
                         "Roll: "
@@ -102,7 +103,7 @@ pub fn AccordionContent(props: AccordionContentProps) -> Element {
     rsx! {
         accordion::AccordionContent {
             class: "accordion-content",
-            // style: "--collapsible-content-width: 140px",
+            // style: "--collapsible-content-width: 100%",
             id: props.id,
             attributes: props.attributes,
             {props.children}

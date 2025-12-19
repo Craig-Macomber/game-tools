@@ -2,6 +2,12 @@
     box-sizing: border-box;
 }
 
+:root {
+    --primary-color-6: #586070;
+    --secondary-color-4: #3a3b3e;
+    --focused-border-color: #1e6dff;
+}
+
 h1 {
     margin: 1rem;
     margin-bottom: 0.15rem;
@@ -136,7 +142,7 @@ body {
     width: 100%;
 }
 
-/* Based on https: //github.com/DioxusLabs/components/blob/main/preview/src/components/accordion/style.css */
+/* Based on https://github.com/DioxusLabs/components/blob/main/preview/src/components/accordion/style.css */
 
 .accordion-trigger {
     display: flex;
@@ -167,7 +173,7 @@ body {
 
 .accordion-content {
     display: grid;
-    height: 0;
+    height: fit-content;
 }
 
 .accordion-content[data-open="false"] {
@@ -180,21 +186,21 @@ body {
 
 @keyframes accordion-slide-down {
     from {
-        height: var(--collapsible-content-width);
+        max-height: 100px;
     }
 
     to {
-        height: 0;
+        max-height: 0;
     }
 }
 
 @keyframes accordion-slide-up {
     from {
-        height: 0;
+        max-height: 0;
     }
 
     to {
-        height: var(--collapsible-content-width);
+        max-height: 100px;
     }
 }
 
