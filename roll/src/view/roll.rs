@@ -234,7 +234,6 @@ pub fn Attack(modifier: String, damage_dice: String, damage_fixed: String) -> El
     rsx!(
         span {
             Button {
-                variant: ButtonVariant::Secondary,
                 onclick: move |_| {
                     roll(disadvantage, &modifier_roller, &damage_dice_roller, &damage_fixed_roller);
                 },
@@ -252,7 +251,6 @@ pub fn Attack(modifier: String, damage_dice: String, damage_fixed: String) -> El
                 }
             }
             Button {
-                variant: ButtonVariant::Secondary,
                 onclick: move |_| {
                     roll(
                         advantage,
