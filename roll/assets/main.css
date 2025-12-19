@@ -135,3 +135,11 @@ body {
     height: 100%;
     width: 100%;
 }
+
+a:visited {
+    color: var(--dark, rgb(201, 164, 201)) var(--light, purple);
+}
+
+a:link {
+    color: var(--dark, rgb(191, 234, 236)) var(--light, blue);
+}
