@@ -1,32 +1,14 @@
+use crate::components::accordion::*;
 use dioxus::prelude::*;
-use dioxus_primitives::accordion::{
-    self, AccordionContentProps, AccordionItemProps, AccordionProps, AccordionTriggerProps,
-};
-
-#[component]
-pub fn Accordion(props: AccordionProps) -> Element {
-    rsx! {
-        accordion::Accordion {
-            class: "accordion",
-            // width: "15rem",
-            id: props.id,
-            allow_multiple_open: props.allow_multiple_open,
-            disabled: props.disabled,
-            collapsible: props.collapsible,
-            horizontal: props.horizontal,
-            attributes: props.attributes,
-            {props.children}
-        }
-    }
-}
 
 #[component]
 pub fn Syntax() -> Element {
     rsx! {
-        Accordion {
-            allow_multiple_open: true,
+        Accordion { allow_multiple_open: true,
             AccordionItem { index: 0, default_open: true,
-                AccordionTrigger { h3 { "Syntax" } }
+                AccordionTrigger {
+                    div {  h3 { "Syntax" }}
+                }
                 AccordionContent {
                     span {
                         a { href: "https://commonmark.org/help/", "Markdown" }
@@ -44,7 +26,9 @@ pub fn Syntax() -> Element {
                 }
             }
             AccordionItem { index: 2,
-                AccordionTrigger { h3 { "Tags" } }
+                AccordionTrigger {
+                    h3 { "Tags" }
+                }
                 AccordionContent {
                     span {
                         "Roll: "
@@ -60,53 +44,6 @@ pub fn Syntax() -> Element {
                     }
                 }
             }
-        }
-    }
-}
-
-#[component]
-pub fn AccordionItem(props: AccordionItemProps) -> Element {
-    rsx! {
-        accordion::AccordionItem {
-            class: "accordion-item",
-            disabled: props.disabled,
-            default_open: props.default_open,
-            on_change: props.on_change,
-            on_trigger_click: props.on_trigger_click,
-            index: props.index,
-            attributes: props.attributes,
-            {props.children}
-        }
-    }
-}
-
-#[component]
-pub fn AccordionTrigger(props: AccordionTriggerProps) -> Element {
-    rsx! {
-        accordion::AccordionTrigger {
-            class: "accordion-trigger",
-            id: props.id,
-            attributes: props.attributes,
-            {props.children}
-            svg {
-                class: "accordion-expand-icon",
-                view_box: "0 0 24 24",
-                xmlns: "http://www.w3.org/2000/svg",
-                polyline { points: "6 9 12 15 18 9" }
-            }
-        }
-    }
-}
-
-#[component]
-pub fn AccordionContent(props: AccordionContentProps) -> Element {
-    rsx! {
-        accordion::AccordionContent {
-            class: "accordion-content",
-            // style: "--collapsible-content-width: 100%",
-            id: props.id,
-            attributes: props.attributes,
-            {props.children}
         }
     }
 }
