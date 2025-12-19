@@ -2,6 +2,7 @@ use caith::{Command, EvaluatedExpression, Expression, Rollable, Verbosity};
 use dioxus::prelude::*;
 use dioxus_markdown::{CustomComponents, Markdown};
 
+use crate::components::button::*;
 use crate::{LogItem, view::log::LOG};
 
 use std::vec;
@@ -77,9 +78,17 @@ fn Counter(initial: i32) -> Element {
 
     rsx! {
         span {
-            button { onclick: move |_| count -= 1, "-" }
+            Button {
+                variant: ButtonVariant::Secondary,
+                onclick: move |_| count -= 1,
+                "-"
+            }
             "{count}"
-            button { onclick: move |_| count += 1, "+" }
+            Button {
+                variant: ButtonVariant::Secondary,
+                onclick: move |_| count += 1,
+                "+"
+            }
         }
     }
 }
@@ -92,8 +101,8 @@ pub fn Roll(spec: String) -> Element {
     match validate_roller(&spec) {
         Ok(roller) => {
             rsx!(
-                button {
-                    class: "roll-button",
+                Button {
+                    variant: ButtonVariant::Secondary,
                     title: "{roller:?}",
                     onclick: move |_| {
                         let roll = roller.roll();
@@ -233,15 +242,15 @@ pub fn Attack(modifier: String, damage_dice: String, damage_fixed: String) -> El
     let damage_fixed_roller_3 = damage_fixed_roller.clone();
     rsx!(
         span {
-            button {
-                class: "roll-button",
+            Button {
+                variant: ButtonVariant::Secondary,
                 onclick: move |_| {
                     roll(disadvantage, &modifier_roller, &damage_dice_roller, &damage_fixed_roller);
                 },
                 b { "-" }
             }
-            button {
-                class: "roll-button",
+            Button {
+                variant: ButtonVariant::Secondary,
                 onclick: move |_| {
                     roll(regular, &modifier_roller_2, &damage_dice_roller_2, &damage_fixed_roller_2);
                 },
@@ -252,8 +261,8 @@ pub fn Attack(modifier: String, damage_dice: String, damage_fixed: String) -> El
                     " damage"
                 }
             }
-            button {
-                class: "roll-button",
+            Button {
+                variant: ButtonVariant::Secondary,
                 onclick: move |_| {
                     roll(
                         advantage,

@@ -1,4 +1,5 @@
 use crate::State;
+use crate::components::button::*;
 
 use dioxus::prelude::*;
 use log::LogView;
@@ -46,7 +47,11 @@ pub(crate) fn Body() -> Element {
                 h2 { style: "flex: 0;", "Edit:" }
                 div { class: "bar",
                     span { class: "bar-item",
-                        button { onclick: move |_| { save_url(&state.read().lines) }, "Save to URL" }
+                        Button {
+                            variant: ButtonVariant::Secondary,
+                            onclick: move |_| { save_url(&state.read().lines) },
+                            "Save to URL"
+                        }
                     }
                     Storage {}
                     span { class: "bar-item",
@@ -98,10 +103,13 @@ fn Storage() -> Element {
     rsx!(
         span { class: "bar-item",
             "Local Storage:"
-            button { onclick: move |_| { save_storage(STORAGE_KEY, Some(&state.read().lines)) },
+            Button {
+                variant: ButtonVariant::Secondary,
+                onclick: move |_| { save_storage(STORAGE_KEY, Some(&state.read().lines)) },
                 "Save"
             }
-            button {
+            Button {
+                variant: ButtonVariant::Secondary,
                 onclick: move |_| {
                     let storage = load_storage(STORAGE_KEY);
                     match storage {
@@ -118,7 +126,11 @@ fn Storage() -> Element {
                 },
                 "Load"
             }
-            button { onclick: |_| { save_storage(STORAGE_KEY, None) }, "Clear" }
+            Button {
+                variant: ButtonVariant::Destructive,
+                onclick: |_| { save_storage(STORAGE_KEY, None) },
+                "Clear"
+            }
         }
     )
 }

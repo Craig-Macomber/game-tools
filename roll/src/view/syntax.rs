@@ -7,7 +7,9 @@ pub fn Syntax() -> Element {
         Accordion { allow_multiple_open: true,
             AccordionItem { index: 0, default_open: true,
                 AccordionTrigger {
-                    div {  h3 { "Syntax" }}
+                    div {
+                        h3 { "Syntax" }
+                    }
                 }
                 AccordionContent {
                     span {

@@ -1,3 +1,4 @@
+use crate::components::button::*;
 use dioxus::prelude::*;
 use std::{borrow::Borrow, vec};
 
@@ -99,7 +100,8 @@ pub fn Clear() -> Element {
 pub fn ClearButton() -> Element {
     let sync = LOG.read().sync;
     rsx!(
-        button {
+        Button {
+            variant: ButtonVariant::Destructive,
             onclick: move |_| {
                 *LOG.write() = Log { sync, log: Vec::default() };
             },
@@ -113,7 +115,8 @@ pub fn LoadButton() -> Element {
     let sync = LOG.read().sync;
     if sync {
         rsx!(
-            button {
+            Button {
+                variant: ButtonVariant::Secondary,
                 onclick: move |_| {
                     LOG.write().sync = false;
                     #[cfg(target_arch = "wasm32")]
@@ -126,7 +129,8 @@ pub fn LoadButton() -> Element {
         )
     } else {
         rsx!(
-            button {
+            Button {
+                variant: ButtonVariant::Secondary,
                 onclick: move |_| {
                     *LOG.write() = load_or_new_log(false);
                     LOG.write().sync = true;
