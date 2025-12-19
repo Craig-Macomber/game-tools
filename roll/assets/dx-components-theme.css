@@ -28,12 +28,6 @@ body {
   }
 }
 
-/* For now force light mode until all of UI is themed properly */
-:root {
-  --dark: ;
-  --light: initial;
-}
-
 :root {
   /* Primary colors */
   --primary-color: var(--dark, #000) var(--light, #fff);

@@ -45,7 +45,7 @@ h6 {
 .bar {
     display: flex;
     justify-content: space_around;
-    background-color: #eee;
+    background-color: var(--primary-color-5);
     padding: 0.1rem;
     flex-wrap: wrap;
     align-items: center;
@@ -70,11 +70,11 @@ h6 {
 }
 
 #Roll {
-    background-color: #eee;
+    background-color: var(--primary-color-6);
 }
 
 #Roll-Content {
-    background-color: #ccc;
+    background-color: var(--primary-color-5);
     padding: 0.5rem;
 }
 

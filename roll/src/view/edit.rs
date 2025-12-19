@@ -1,6 +1,7 @@
 use std::borrow::BorrowMut;
 
 use crate::components::button::*;
+use crate::components::textarea::Textarea;
 use crate::{State, components::accordion::*, save_url};
 use dioxus::prelude::*;
 
@@ -10,7 +11,7 @@ pub fn Edit(state: Signal<State>) -> Element {
     rsx! {
         h2 { style: "flex: 0;", "Edit:" }
         Syntax { state }
-        textarea {
+        Textarea {
             style: "flex-grow: 1;",
             value: "{lines}",
             oninput: {
