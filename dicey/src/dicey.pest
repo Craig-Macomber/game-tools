@@ -1,0 +1,53 @@
+number = @{ ASCII_DIGIT+ }
+float = @{ ("+" | "-")? ~ ASCII_DIGIT+ ~ fraction }
+fraction = @{ "." ~ ASCII_DIGIT{1,2}}
+number_of_dice = @{ ASCII_NONZERO_DIGIT+ ~ ASCII_DIGIT* }
+op = _{ add | sub | mul | div }
+add = { "+" }
+sub = { "-" }
+mul = { "*" }
+div = { "/" }
+
+dice = { number_of_dice? ~ (roll ~ dice_side) ~ option* ~ target_failure{, 3} }
+
+// An instance of a DiceKind
+dice_side = _{ number | fudge }
+
+// An instance of a DiceKind's roll type
+dice_value = _{ number | fudge_value }
+fudge_value = @{ "(-)" | "( )" | "(+)" }
+
+fudge = { "F" | "f" }
+roll = { "d" | "D" }
+option = _{ explode | i_explode | reroll | i_reroll | keep_hi | keep_lo | drop_hi | drop_lo }
+target_failure = _{ target | double_target | failure }
+explode = { "e" ~ dice_value? }
+i_explode = { ("ie" | "!") ~ dice_value? }
+reroll = { "r" ~ dice_value }
+i_reroll = { "ir" ~ dice_value }
+keep_hi = { "K" ~ number }
+keep_lo = { "k" ~ number }
+drop_hi = { "D" ~ number }
+drop_lo = { "d" ~ number }
+target =  { "t" ~ (dice_value | target_enum) }
+double_target = { "tt" ~ dice_value }
+failure =  { "f" ~ dice_value }
+target_enum = { "[" ~ dice_value_list ~ "]"}
+dice_value_list = _{ dice_value ~ ("," ~ dice_value)* }
+
+repeated_expr = { "(" ~ expr ~ ")" ~ "^" ~ (add | sort)? ~ number }
+
+// A reference to an externally provided variable
+variable = _{ "$" ~ variable_identifier }
+variable_identifier = @{ ( LETTER | NUMBER )+ }
+
+expr = { leaf ~ (op ~ leaf)* }
+leaf = _{ dice | float | integer | block_expr | variable }
+block_expr = { "(" ~ expr ~ ")" }
+integer = { ("+" | "-")? ~ number }
+reason = { ":" ~ ANY* }
+sort = { "#" }
+command = _{ SOI ~ (repeated_expr | expr) ~ reason? ~ EOI }
+single_command = _{ SOI ~ expr ~ EOI }
+
+WHITESPACE = _{ " " | " " }

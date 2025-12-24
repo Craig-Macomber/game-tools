@@ -1,6 +1,6 @@
 [workspace]
 
-members = ["roll"]
+members = ["dicey", "roll"]
 resolver = "2"
 
 [profile]

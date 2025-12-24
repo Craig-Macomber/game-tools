@@ -928,6 +928,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "dicey"
+version = "0.1.0"
+dependencies = [
+ "pest",
+ "pest_derive",
+ "rand 0.9.2",
+ "rand_core 0.9.3",
+]
+
+[[package]]
 name = "digest"
 version = "0.10.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
