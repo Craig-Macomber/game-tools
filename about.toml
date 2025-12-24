@@ -4,9 +4,10 @@
 
 # cargo license --avoid-dev-deps --avoid-build-deps --filter-platform wasm32-unknown-unknown --features web
 # cargo tree --target wasm32-unknown-unknown --features web
+# cargo about generate about.hbs
 
 
-accepted = ["MIT", "Apache-2.0", "Unicode-3.0", "Zlib", "CC0-1.0"]
+accepted = ["MIT", "Apache-2.0", "Unicode-3.0", "Zlib", "CC0-1.0", "WTFPL"]
 targets = ["wasm32-unknown-unknown"]
 ignore-build-dependencies = true
 ignore-dev-dependencies = true
