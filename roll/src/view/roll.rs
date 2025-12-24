@@ -1,66 +1,99 @@
 use caith::{Command, EvaluatedExpression, Expression, Rollable, Verbosity};
 use dioxus::prelude::*;
-use dioxus_markdown::{CustomComponents, Markdown};
+use dioxus_markdown::{CustomComponents, Markdown, ReadWriteBox};
+use subslice_offset::SubsliceOffset;
 
 use crate::components::button::*;
 use crate::{LogItem, view::log::LOG};
 
+use std::collections::HashMap;
 use std::vec;
 
 /**
  * Rendered markdown results with inline rollers that put their result in "Log".
  */
 #[component]
-pub(crate) fn Rollers(lines: String) -> Element {
-    let mut components = CustomComponents::new();
+pub(crate) fn Rollers(lines: Signal<String>) -> Element {
+    let mut markdown: Vec<Element> = vec![];
+    let lines_holder = lines.read().clone();
+    let lines_slice = &lines_holder[..];
 
-    components.register("Counter", |props| {
-        Ok(rsx! {
-            Counter { initial: props.get_parsed_optional("initial")?.unwrap_or(0) }
-        })
-    });
-
-    components.register("Roll", |props| {
-        Ok(rsx! {
-            Roll { spec: props.get("d").unwrap_or("Invalid".to_string()) }
-        })
-    });
-
-    components.register("R", |props| {
-        Ok(rsx! {
-            Roll { spec: props.get("d").unwrap_or("Invalid".to_string()) }
-        })
-    });
-
-    components.register("A", |props| {
-        Ok(rsx! {
-            Attack {
-                modifier: props.get("m").unwrap_or("Invalid".to_string()),
-                damage_dice: props.get("d").unwrap_or("Invalid".to_string()),
-                damage_fixed: props.get("f").unwrap_or("Invalid".to_string()),
-            }
-        })
-    });
-
-    let mut markdown: Vec<String> = vec![];
-    for line in lines.lines() {
+    for line in lines_slice.lines() {
+        let offset = lines_slice.subslice_offset(line).unwrap();
         let roller = try_roller(line);
-        match roller {
-            Some(_) => markdown.push(format!("<R d=\"{line}\"/>")),
-            None => markdown.push(line.to_string()),
-        }
+        let (line, negative_offset) = match roller {
+            Some(_) => (format!("<R d=\"{line}\"/>"), 6),
+            None => (line.to_string(), 0),
+        };
+
+        let mut components = CustomComponents::new();
+
+        components.register("Constant", |props| {
+            Ok(rsx! {
+                Constant {
+                    name: props.get_parsed("name").unwrap_or("Invalid".to_string()),
+                    value: props.get_parsed("value").unwrap_or("Invalid".to_string()),
+                }
+            })
+        });
+
+        components.register("Counter", move |props| {
+            let value = props
+                .get_attribute("value")
+                .ok_or(rsx! { "Missing \"vale\" attribute." })?;
+            let range = (value.range.start + offset - negative_offset)
+                ..(value.range.end + offset - negative_offset);
+            let count = ReadWriteBox::from_sub_string(lines, range)?;
+            Ok(rsx! {
+                Counter { count }
+            })
+        });
+
+        components.register("Roll", |props| {
+            Ok(rsx! {
+                Roll { spec: props.get("d").unwrap_or("Invalid".to_string()) }
+            })
+        });
+
+        components.register("R", |props| {
+            Ok(rsx! {
+                Roll { spec: props.get("d").unwrap_or("Invalid".to_string()) }
+            })
+        });
+
+        components.register("A", |props| {
+            Ok(rsx! {
+                Attack {
+                    modifier: props.get("m").unwrap_or("Invalid".to_string()),
+                    damage_dice: props.get("d").unwrap_or("Invalid".to_string()),
+                    damage_fixed: props.get("f").unwrap_or("Invalid".to_string()),
+                }
+            })
+        });
+
+        use_context_provider(|| Signal::new(Constants::default()));
+        markdown.push(rsx!(
+            Markdown {
+                src: line.clone(),
+                components,
+                preserve_html: false
+            } // hard_line_breaks: true,
+        ));
     }
 
     rsx!(
         h2 { "Roll:" }
         div { id: "Roll-Content",
-            Markdown {
-                src: markdown.join("\n"),
-                components,
-                preserve_html: false,
+            for item in markdown {
+                {item}
             }
         }
     )
+}
+
+#[derive(Default)]
+struct Constants {
+    values: HashMap<String, caith::Result<Expression>>,
 }
 
 pub fn try_roller(spec: &str) -> Option<String> {
@@ -72,16 +105,37 @@ pub fn try_roller(spec: &str) -> Option<String> {
     }
 }
 
+/// A counter who's current count is stored in the document.
 #[component]
-fn Counter(initial: i32) -> Element {
-    let mut count = use_signal(|| initial);
-
+fn Counter(count: ReadWriteBox<i32>) -> Element {
+    let mut count2 = count.clone();
     rsx! {
         span {
-            Button { onclick: move |_| count -= 1, "-" }
+            Button { onclick: move |_| count2 -= 1, "-" }
             "{count}"
             Button { onclick: move |_| count += 1, "+" }
         }
+    }
+}
+
+#[component]
+fn Constant(name: String, value: String) -> Element {
+    let mut state = use_context::<Signal<Constants>>();
+
+    let data = Expression::parse(&value);
+
+    state.write().values.insert(name.clone(), data.clone());
+
+    match data {
+        Ok(data) => rsx! {
+            span { "Constant: {name} = {data}" }
+        },
+        Err(error) => rsx! {
+            span {
+                "Invalid Constant: {name} = "
+                RollError { error, spec: value }
+            }
+        },
     }
 }
 
@@ -113,6 +167,11 @@ pub fn Roll(spec: String) -> Element {
 
 fn validate_roller(spec: &str) -> Result<Command, Element> {
     Command::parse(spec).map_err(|e| roll_error(e, spec))
+}
+
+#[component]
+fn RollError(error: caith::RollError, spec: String) -> Element {
+    roll_error(error, &spec)
 }
 
 fn roll_error(error: caith::RollError, spec: &str) -> Element {

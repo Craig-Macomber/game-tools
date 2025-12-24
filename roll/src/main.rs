@@ -3,7 +3,7 @@ mod view;
 
 #[derive(Debug, Default, Clone)]
 struct State {
-    lines: String,
+    lines: Signal<String>,
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -47,7 +47,7 @@ fn main() {
 fn App() -> Element {
     use_context_provider(|| {
         Signal::new(State {
-            lines: load_default(),
+            lines: Signal::new(load_default()),
         })
     });
     rsx! {
@@ -122,7 +122,7 @@ static DEFAULT_TEXT: &'static str = r#"# Examples:
 <A m="5" d="2d6 + 1d8" f="2"/>
 
 ## Counter:
-Health: <Counter initial="20"/>
+Health: <Counter value="20"/>
 "#;
 
 #[cfg(target_arch = "wasm32")]

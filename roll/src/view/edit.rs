@@ -16,7 +16,7 @@ pub fn Edit(state: Signal<State>) -> Element {
             value: "{lines}",
             oninput: {
                 move |event: Event<FormData>| {
-                    state.write().borrow_mut().lines = event.value();
+                    state.write().lines.set(event.value());
                 }
             },
         }
@@ -33,7 +33,7 @@ fn Storage() -> Element {
     rsx!(
         span {
             "Local Storage:"
-            Button { onclick: move |_| { save_storage(STORAGE_KEY, Some(&state.read().lines)) },
+            Button { onclick: move |_| { save_storage(STORAGE_KEY, Some(&state.read().lines.read())) },
                 "Save"
             }
             Button {
@@ -41,7 +41,7 @@ fn Storage() -> Element {
                     let storage = load_storage(STORAGE_KEY);
                     match storage {
                         Some(data) => {
-                            state.write().borrow_mut().lines = data;
+                            state.write().borrow_mut().lines.set(data);
                         }
                         None => {
                             web_sys::window()
@@ -82,7 +82,9 @@ fn Syntax(state: Signal<State>) -> Element {
                 }
                 AccordionContent {
                     span {
-                        Button { onclick: move |_| { save_url(&state.read().lines) }, "Save to URL" }
+                        Button { onclick: move |_| { save_url(&state.read().lines.read()) },
+                            "Save to URL"
+                        }
                     }
                     Storage {}
                     span {
@@ -96,7 +98,7 @@ fn Syntax(state: Signal<State>) -> Element {
                                 async move {
                                     for file in evt.files() {
                                         if let Ok(file) = file.read_string().await {
-                                            state.write().borrow_mut().lines = file;
+                                            state.write().borrow_mut().lines.set(file);
                                         }
                                     }
                                 }

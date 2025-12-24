@@ -452,7 +452,7 @@ dependencies = [
 [[package]]
 name = "caith"
 version = "4.2.4"
-source = "git+https://github.com/Craig-Macomber/caith?rev=f42d5cf2b2523db62c007247db6f392dc308ba72#f42d5cf2b2523db62c007247db6f392dc308ba72"
+source = "git+https://github.com/Craig-Macomber/caith?rev=1c8be7bbc10cea8703dad44031976a865972893d#1c8be7bbc10cea8703dad44031976a865972893d"
 dependencies = [
  "pest",
  "pest_derive",
@@ -1354,7 +1354,7 @@ dependencies = [
 [[package]]
 name = "dioxus-markdown"
 version = "0.0.1"
-source = "git+https://github.com/Craig-Macomber/rust-web-markdown?rev=e06e3f117c8c26f1f90a6802d85c4c69b2ff9a0e#e06e3f117c8c26f1f90a6802d85c4c69b2ff9a0e"
+source = "git+https://github.com/rambip/rust-web-markdown?rev=1e9fb80e9cde417689a414963b168f6958e7b7bd#1e9fb80e9cde417689a414963b168f6958e7b7bd"
 dependencies = [
  "dioxus",
  "web-framework-markdown",
@@ -4228,6 +4228,7 @@ dependencies = [
  "js-sys",
  "serde",
  "serde_json",
+ "subslice-offset",
  "wasm-bindgen",
  "web-sys",
 ]
@@ -4748,6 +4749,12 @@ checksum = "d07aa455c66ddfdbb51507537402b961e027846468954ef8d974bce65dff9eb0"
 dependencies = [
  "serde",
 ]
+
+[[package]]
+name = "subslice-offset"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c883fb2521558a8be70f0f1922babf736f9f72dfbe6ae4f397de3aefb74627ec"
 
 [[package]]
 name = "subtle"
@@ -5613,7 +5620,7 @@ dependencies = [
 [[package]]
 name = "web-framework-markdown"
 version = "0.0.1"
-source = "git+https://github.com/Craig-Macomber/rust-web-markdown?rev=e06e3f117c8c26f1f90a6802d85c4c69b2ff9a0e#e06e3f117c8c26f1f90a6802d85c4c69b2ff9a0e"
+source = "git+https://github.com/rambip/rust-web-markdown?rev=1e9fb80e9cde417689a414963b168f6958e7b7bd#1e9fb80e9cde417689a414963b168f6958e7b7bd"
 dependencies = [
  "lazy_static",
  "pulldown-cmark",
