@@ -118,8 +118,8 @@ fn Syntax(state: Signal<State>) -> Element {
                     span {
                         a { href: "https://commonmark.org/help/", "Markdown" }
                         " with "
-                        a { href: "https://github.com/Geobert/caith?tab=readme-ov-file#syntax",
-                            "Caith dice notation"
+                        a { href: "https://github.com/Craig-Macomber/game-tools/blob/main/dicey/README.md#syntax",
+                            "Dicey dice notation"
                         }
                         "."
                     }

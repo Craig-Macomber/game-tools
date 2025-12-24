@@ -10,7 +10,6 @@ license = "MIT"
 [dependencies]
 dioxus = { version = "0.7.0", features = [] }
 # dioxus-sdk = { version = "0.6.0", features = ["storage"] }
-# Has a fix for https://github.com/Geobert/caith/issues/5
 dicey = { path = "../dicey" }
 # Disable default features to opt out of "math" since it is not supported on desktop builds
 dioxus-markdown = { git = "https://github.com/rambip/rust-web-markdown", rev = "1e9fb80e9cde417689a414963b168f6958e7b7bd", default-features = false }
@@ -23,7 +22,7 @@ serde = "1.0.219"
 dioxus-primitives = { git = "https://github.com/DioxusLabs/components", version = "0.0.1", default-features = false }
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
-# caith pulls in "getrandom" which needs custom features to support WASM:
+# dicey pulls in "getrandom" which needs custom features to support WASM:
 getrandom = { version = "0.3.2", features = ["wasm_js"] }
 web-sys = { version = "0.3.76", features = [
     "Document",

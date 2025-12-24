@@ -6,7 +6,7 @@ edition = "2024"
 description = "A dice roller library supporting many features"
 keywords = ["dice", "roll", "RPG", "roll", "random"]
 categories = ["game-development", "games"]
-repository = "https://github.com/Craig-Macomber/caith"
+repository = "https://github.com/Craig-Macomber/game-tools"
 license = "MIT"
 readme = "README.md"
 

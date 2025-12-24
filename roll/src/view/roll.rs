@@ -140,7 +140,7 @@ fn Constant(name: String, value: String) -> Element {
 }
 
 /**
- * Display text, or a roll button depending on if string is a valid roll specification (in caith dice notation).
+ * Display text, or a roll button depending on if string is a valid roll specification (in dicey dice notation).
  */
 #[component]
 pub fn Roll(spec: String) -> Element {
@@ -188,7 +188,7 @@ fn get_dice_string(roll: &Box<dyn EvaluatedExpression>) -> String {
 }
 
 /**
- * Display text, or a roll button depending on if string is a valid roll specification (in caith dice notation).
+ * Display text, or a roll button depending on if string is a valid roll specification (in dicey dice notation).
  */
 #[component]
 pub fn Attack(modifier: String, damage_dice: String, damage_fixed: String) -> Element {

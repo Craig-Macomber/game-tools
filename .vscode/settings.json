@@ -1,7 +1,6 @@
 {
   // "rust-analyzer.cargo.target": "wasm32-unknown-unknown",
   "cSpell.words": [
-    "caith",
     "chrono",
     "dioxus",
     "lerp",
