@@ -1,4 +1,4 @@
-use caith::{Command, EvaluatedExpression, Expression, Rollable, Verbosity};
+use dicey::{Command, EvaluatedExpression, Expression, Rollable, Verbosity};
 use dioxus::prelude::*;
 use dioxus_markdown::{CustomComponents, Markdown, ReadWriteBox};
 use subslice_offset::SubsliceOffset;
@@ -93,7 +93,7 @@ pub(crate) fn Rollers(lines: Signal<String>) -> Element {
 
 #[derive(Default)]
 struct Constants {
-    values: HashMap<String, caith::Result<Expression>>,
+    values: HashMap<String, dicey::Result<Expression>>,
 }
 
 pub fn try_roller(spec: &str) -> Option<String> {
@@ -170,11 +170,11 @@ fn validate_roller(spec: &str) -> Result<Command, Element> {
 }
 
 #[component]
-fn RollError(error: caith::RollError, spec: String) -> Element {
+fn RollError(error: dicey::RollError, spec: String) -> Element {
     roll_error(error, &spec)
 }
 
-fn roll_error(error: caith::RollError, spec: &str) -> Element {
+fn roll_error(error: dicey::RollError, spec: &str) -> Element {
     rsx!(
         // Not a valid roll, so display as Markdown, but include error from Roller as hover text in case it was intended to be a roll button.
         span { title: "{error}",
@@ -251,7 +251,7 @@ pub fn Attack(modifier: String, damage_dice: String, damage_fixed: String) -> El
         modifier: &Expression,
         damage_dice: &Expression,
         damage_fixed: &Expression,
-    ) -> caith::Result<String> {
+    ) -> dicey::Result<String> {
         let attack_roller = Expression::parse(attack)?;
         let attack_roll: Box<dyn EvaluatedExpression> = attack_roller.roll()?;
 

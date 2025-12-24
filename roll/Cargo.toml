@@ -11,7 +11,7 @@ license = "MIT"
 dioxus = { version = "0.7.0", features = [] }
 # dioxus-sdk = { version = "0.6.0", features = ["storage"] }
 # Has a fix for https://github.com/Geobert/caith/issues/5
-caith = { git = "https://github.com/Craig-Macomber/caith", rev = "1c8be7bbc10cea8703dad44031976a865972893d" }
+dicey = { path = "../dicey" }
 # Disable default features to opt out of "math" since it is not supported on desktop builds
 dioxus-markdown = { git = "https://github.com/rambip/rust-web-markdown", rev = "1e9fb80e9cde417689a414963b168f6958e7b7bd", default-features = false }
 subslice-offset = "0.1.1"

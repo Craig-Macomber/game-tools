@@ -450,16 +450,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "caith"
-version = "4.2.4"
-source = "git+https://github.com/Craig-Macomber/caith?rev=1c8be7bbc10cea8703dad44031976a865972893d#1c8be7bbc10cea8703dad44031976a865972893d"
-dependencies = [
- "pest",
- "pest_derive",
- "rand 0.9.2",
-]
-
-[[package]]
 name = "cc"
 version = "1.2.49"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4229,8 +4219,8 @@ name = "roll"
 version = "0.1.0"
 dependencies = [
  "async-std",
- "caith",
  "chrono",
+ "dicey",
  "dioxus",
  "dioxus-markdown",
  "dioxus-primitives",
