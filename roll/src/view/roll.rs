@@ -183,7 +183,7 @@ fn roll_error(error: dicey::RollError, spec: &str) -> Element {
     )
 }
 
-fn get_dice_string(roll: &Box<dyn EvaluatedExpression>) -> String {
+fn get_dice_string(roll: &dyn EvaluatedExpression) -> String {
     roll.format_history(true, Verbosity::Medium)
 }
 
@@ -263,10 +263,10 @@ pub fn Attack(modifier: String, damage_dice: String, damage_fixed: String) -> El
 
         let damage_fixed = damage_fixed.roll()?.total();
 
-        let attack_string = get_dice_string(&attack_roll);
-        let damage_string = get_dice_string(&damage_dice_roll);
+        let attack_string = get_dice_string(&*attack_roll);
+        let damage_string = get_dice_string(&*damage_dice_roll);
         let damage_total = damage_dice_roll.total() + damage_fixed;
-        let crit = get_crit(&attack_roll);
+        let crit = get_crit(&*attack_roll);
 
         Ok(match crit {
             Critic::No => format!(
@@ -275,7 +275,7 @@ pub fn Attack(modifier: String, damage_dice: String, damage_fixed: String) -> El
             Critic::Min => format!("**Crit Miss** {attack_string}"),
             Critic::Max => {
                 let damage_dice_roll_2 = damage_dice.roll()?;
-                let damage_string_2 = get_dice_string(&damage_dice_roll_2);
+                let damage_string_2 = get_dice_string(&*damage_dice_roll_2);
                 let damage_total = damage_total + damage_dice_roll_2.total();
                 format!(
                     "**Crit** {attack_string} *Damage*: **{damage_total}** = {damage_string} + {damage_string_2} + {damage_fixed}"
@@ -324,7 +324,7 @@ pub fn Attack(modifier: String, damage_dice: String, damage_fixed: String) -> El
     )
 }
 
-fn get_crit(r: &Box<dyn EvaluatedExpression>) -> Critic {
+fn get_crit(r: &dyn EvaluatedExpression) -> Critic {
     let crit = r.total() == 20.0;
     if crit {
         return Critic::Max;
