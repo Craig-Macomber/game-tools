@@ -36,7 +36,7 @@ pub(crate) fn LogView() -> Element {
 }
 
 #[cfg(target_arch = "wasm32")]
-static LOG_STORAGE_KEY: &'static str = "roller: log";
+static LOG_STORAGE_KEY: &str = "roller: log";
 
 #[cfg(target_arch = "wasm32")]
 #[component]

@@ -89,9 +89,9 @@ fn load_default() -> String {
 
     #[cfg(target_arch = "wasm32")]
     {
-        return load_url().unwrap_or_else(|| {
+        load_url().unwrap_or_else(|| {
             load_storage(STORAGE_KEY).unwrap_or_else(|| DEFAULT_TEXT.to_owned())
-        });
+        })
     }
 }
 
@@ -135,7 +135,7 @@ fn save_url(data: &str) {
 }
 
 #[cfg(target_arch = "wasm32")]
-static STORAGE_KEY: &'static str = "roller: text";
+static STORAGE_KEY: &str = "roller: text";
 
 #[cfg(target_arch = "wasm32")]
 fn save_storage(key: &str, data: Option<&str>) {
