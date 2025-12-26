@@ -84,7 +84,7 @@ fn load_url() -> Option<String> {
 fn load_default() -> String {
     #[cfg(not(target_arch = "wasm32"))]
     {
-        return DEFAULT_TEXT.to_owned();
+        DEFAULT_TEXT.to_owned()
     }
 
     #[cfg(target_arch = "wasm32")]
@@ -95,7 +95,7 @@ fn load_default() -> String {
     }
 }
 
-static DEFAULT_TEXT: &'static str = r#"# Examples:
+static DEFAULT_TEXT: &str = r#"# Examples:
 1d20
 2d6 + 1d4 + 5
 

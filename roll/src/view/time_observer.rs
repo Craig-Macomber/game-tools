@@ -102,11 +102,10 @@ impl TimeObserver {
     }
 
     fn wake(&mut self, d: TimeDelta) {
-        if let Some(old) = self.wake {
-            if old < d {
+        if let Some(old) = self.wake
+            && old < d {
                 return;
             }
-        }
         self.wake = Some(d);
     }
 

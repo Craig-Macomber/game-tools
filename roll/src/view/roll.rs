@@ -97,7 +97,7 @@ struct Constants {
 }
 
 pub fn try_roller(spec: &str) -> Option<String> {
-    let roller = Command::parse(&spec);
+    let roller = Command::parse(spec);
 
     match roller {
         Ok(_) => Some(spec.to_string()),

@@ -14,7 +14,7 @@ pub mod time_observer;
 #[component]
 pub(crate) fn Body() -> Element {
     let state = use_context::<Signal<State>>();
-    let lines = state.read().lines.clone();
+    let lines = state.read().lines;
 
     rsx!(
         div { class: "bar",

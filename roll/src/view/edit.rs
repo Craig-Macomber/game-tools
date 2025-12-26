@@ -7,7 +7,7 @@ use dioxus::prelude::*;
 
 #[component]
 pub fn Edit(state: Signal<State>) -> Element {
-    let lines = state.read().lines.clone();
+    let lines = state.read().lines;
     rsx! {
         h2 { style: "flex: 0;", "Edit:" }
         Syntax { state }
