@@ -278,7 +278,7 @@ pub fn Attack(modifier: String, damage_dice: String, damage_fixed: String) -> El
                 let damage_string_2 = get_dice_string(&damage_dice_roll_2);
                 let damage_total = damage_total + damage_dice_roll_2.total();
                 format!(
-                    "**Crit** {attack_string} *Damage*: **{damage_total}** = {damage_string}) + {damage_string_2} + {damage_fixed}"
+                    "**Crit** {attack_string} *Damage*: **{damage_total}** = {damage_string} + {damage_string_2} + {damage_fixed}"
                 )
             }
         })
