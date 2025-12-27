@@ -12,16 +12,27 @@ use std::{collections::HashMap, fmt::Display};
 pub(crate) fn parse_single_command(
     s: &str,
     variables: &HashMap<String, Expression>,
-) -> Result<Expression> {
-    let expr = {
-        let mut pairs = RollParser::parse(Rule::single_command, s)?;
-        let expr_type = pairs.next().unwrap();
-        assert_eq!(expr_type.as_rule(), Rule::expr);
-        expr_type.into_inner()
+) -> Result<Command> {
+    let mut pairs = RollParser::parse(Rule::single_command, s)?;
+    let expr_type = pairs.next().unwrap();
+    assert_eq!(expr_type.as_rule(), Rule::expr);
+    let expr = expr_type.into_inner();
+
+    let expression = parse_expression(expr, variables)?;
+
+    let reason = if let Some(reason) = pairs.next()
+        && reason.as_rule() == Rule::reason_message
+    {
+        Some(reason.as_str().trim().to_owned())
+    } else {
+        None
     };
 
-    let roll_res = parse_expression(expr, variables)?;
-    Ok(roll_res)
+    Ok(Command {
+        expression,
+        repeat: None,
+        reason,
+    })
 }
 
 /// A parsed command.
@@ -162,9 +173,9 @@ impl Command {
         };
 
         if let Some(reason) = pairs.next()
-            && reason.as_rule() == Rule::reason
+            && reason.as_rule() == Rule::reason_message
         {
-            command.reason = Some(reason.as_str()[1..].trim().to_owned());
+            command.reason = Some(reason.as_str().trim().to_owned());
         }
         Ok(command)
     }
@@ -226,7 +237,7 @@ impl Expression {
         expression: &str,
         variables: &HashMap<String, Expression>,
     ) -> Result<Expression> {
-        parse_single_command(expression, variables)
+        parse_single_command(expression, variables).map(|c| c.expression)
     }
 }
 
@@ -234,6 +245,12 @@ impl Expression {
 mod tests {
     use super::*;
     use crate::{RollError, tests::IteratorDiceRollSource};
+
+    #[test]
+    fn reason() {
+        let spec = parse_single_command("1: example reason", &HashMap::default()).unwrap();
+        assert_eq!(spec.reason.unwrap(), "example reason");
+    }
 
     #[test]
     fn dice_command_sum() {

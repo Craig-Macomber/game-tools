@@ -203,10 +203,17 @@ struct VariableReference {
     inner: Expression,
 }
 
+#[derive(Debug)]
+struct VariableReferenceRolled<T> {
+    identifier: String,
+    inner: T,
+}
+
 impl ExpressionRollable for VariableReference {
     fn expression_roll(&self, rng: &mut dyn DiceRollSource) -> ExpressionResult {
-        Ok(Box::new(BlockExpression {
+        Ok(Box::new(VariableReferenceRolled {
             inner: self.inner.roll_with_source(rng)?,
+            identifier: self.identifier.clone(),
         }))
     }
 }
@@ -215,6 +222,24 @@ impl Display for VariableReference {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let inner = &*self.inner.0;
         write!(f, "(${}: {})", self.identifier, inner)
+    }
+}
+
+impl EvaluatedExpression for VariableReferenceRolled<Box<dyn EvaluatedExpression>> {
+    fn total(&self) -> f64 {
+        self.inner.total()
+    }
+
+    fn format_history(&self, markdown: bool, verbose: Verbosity) -> String {
+        if verbose == Verbosity::Verbose {
+            format!(
+                "(${}: {})",
+                self.identifier,
+                self.inner.format_history(markdown, verbose)
+            )
+        } else {
+            format!("${}", self.identifier)
+        }
     }
 }
 
@@ -236,7 +261,7 @@ pub trait EvaluatedExpression: Debug {
 }
 
 /// A verbosity level for formatting output.
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, PartialEq)]
 pub enum Verbosity {
     /// Skips showing some intermediate steps
     Short,
@@ -277,8 +302,8 @@ pub(crate) fn parse_expression(
                     let expr = pair.into_inner();
                     parse_dice::<BasicDice>(expr)?
                 }
-                Rule::variable_identifier => {
-                    let identifier = pair.as_str();
+                Rule::variable => {
+                    let identifier = pair.into_inner().as_str();
                     match variables.get(identifier) {
                         Some(expression) => Expression::new(VariableReference {
                             identifier: identifier.to_string(),
@@ -328,6 +353,14 @@ pub(crate) fn parse_expression(
 mod tests {
     use super::*;
     use crate::tests::IteratorDiceRollSource;
+
+    #[test]
+    fn constant() {
+        let spec = Expression::parse("5").unwrap();
+        let result = spec.roll().unwrap();
+        assert_eq!(result.format(true, Verbosity::Medium), "5 = **5**");
+        assert_eq!(result.total(), 5.0);
+    }
 
     #[test]
     fn single_command_blocks() {

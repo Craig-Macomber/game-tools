@@ -12,6 +12,7 @@ mod dice_kind;
 mod error;
 mod keep_or_drop;
 mod parser;
+mod variable;
 
 pub use expression::{EvaluatedExpression, Expression, Verbosity};
 
