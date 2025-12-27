@@ -44,7 +44,7 @@ pub struct Variable {
     pub expression: Expression,
     /// The identifier of the variable.
     pub identifier: String,
-    /// The reason / comment assoiated with the variable, if any.
+    /// The reason / comment associated with the variable, if any.
     pub reason: Option<String>,
 }
 
@@ -105,7 +105,7 @@ mod tests {
         let variable = parse_variable("$y = $x + 2", &variables).unwrap();
 
         let result = variable.expression.roll().unwrap();
-        assert_eq!(result.format(true, Verbosity::Medium), "$x + 2 = **7**");
+        assert_eq!(result.format(true, Verbosity::Short), "$x + 2 = **7**");
         assert_eq!(variable.identifier, "y");
         assert_eq!(
             result.format(true, Verbosity::Verbose),
