@@ -231,14 +231,14 @@ impl EvaluatedExpression for VariableReferenceRolled<Box<dyn EvaluatedExpression
     }
 
     fn format_history(&self, markdown: bool, verbose: Verbosity) -> String {
-        if verbose == Verbosity::Verbose {
+        if verbose == Verbosity::Short {
+            format!("${}", self.identifier)
+        } else {
             format!(
                 "(${}: {})",
                 self.identifier,
                 self.inner.format_history(markdown, verbose)
             )
-        } else {
-            format!("${}", self.identifier)
         }
     }
 }

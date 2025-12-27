@@ -37,12 +37,30 @@ pub(crate) fn parse_variable(s: &str, variables: &HashMap<String, Expression>) -
     })
 }
 
-/// A parsed command.
+/// A parsed variable declaration.
 #[derive(Debug)]
 pub struct Variable {
-    expression: Expression,
-    identifier: String,
-    reason: Option<String>,
+    /// The expression for the value of the variable.
+    pub expression: Expression,
+    /// The identifier of the variable.
+    pub identifier: String,
+    /// The reason / comment assoiated with the variable, if any.
+    pub reason: Option<String>,
+}
+
+impl Variable {
+    /// Parse a command expression.
+    pub fn parse(s: &str) -> Result<Variable> {
+        Variable::parse_with_variables(s, &HashMap::default())
+    }
+
+    /// Parse a command expression.
+    pub fn parse_with_variables(
+        s: &str,
+        variables: &HashMap<String, Expression>,
+    ) -> Result<Variable> {
+        parse_variable(s, variables)
+    }
 }
 
 #[cfg(test)]

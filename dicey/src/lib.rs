@@ -17,6 +17,7 @@ mod variable;
 pub use expression::{EvaluatedExpression, Expression, Verbosity};
 
 pub use command::{Command, EvaluatedCommand};
+pub use variable::Variable;
 
 pub use error::*;
 

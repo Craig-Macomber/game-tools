@@ -89,9 +89,8 @@ fn load_default() -> String {
 
     #[cfg(target_arch = "wasm32")]
     {
-        load_url().unwrap_or_else(|| {
-            load_storage(STORAGE_KEY).unwrap_or_else(|| DEFAULT_TEXT.to_owned())
-        })
+        load_url()
+            .unwrap_or_else(|| load_storage(STORAGE_KEY).unwrap_or_else(|| DEFAULT_TEXT.to_owned()))
     }
 }
 
@@ -123,6 +122,17 @@ static DEFAULT_TEXT: &str = r#"# Examples:
 
 ## Counter:
 Health: <Counter value="20"/>
+
+# Constants
+
+$attack_bonus = 5
+$damage_bonus = 1d6
+
+<A m="$attack_bonus" d="$damage_bonus" f="2"/>
+<A m="$attack_bonus" d="2d6 + $damage_bonus" f="2"/>
+<A m="$attack_bonus" d="1d4 + $damage_bonus" f="2"/>
+
+
 "#;
 
 #[cfg(target_arch = "wasm32")]

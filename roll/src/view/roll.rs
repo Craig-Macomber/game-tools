@@ -1,4 +1,4 @@
-use dicey::{Command, EvaluatedExpression, Expression, Rollable, Verbosity};
+use dicey::{Command, EvaluatedExpression, Expression, Rollable, Variable, Verbosity};
 use dioxus::prelude::*;
 use dioxus_markdown::{CustomComponents, Markdown, ReadWriteBox};
 use subslice_offset::SubsliceOffset;
@@ -7,6 +7,7 @@ use crate::components::button::*;
 use crate::{LogItem, view::log::LOG};
 
 use std::collections::HashMap;
+use std::rc::Rc;
 use std::vec;
 
 /**
@@ -18,24 +19,26 @@ pub(crate) fn Rollers(lines: Signal<String>) -> Element {
     let lines_holder = lines.read().clone();
     let lines_slice = &lines_holder[..];
 
+    let mut constants = HashMap::default();
+
     for line in lines_slice.lines() {
         let offset = lines_slice.subslice_offset(line).unwrap();
-        let roller = try_roller(line);
+        let roller = try_roller(line, &constants);
         let (line, negative_offset) = match roller {
             Some(_) => (format!("<R d=\"{line}\"/>"), 6),
             None => (line.to_string(), 0),
         };
 
-        let mut components = CustomComponents::new();
+        if let Ok(con) = Variable::parse(&line) {
+            let message = format!("Constant: {} = {}", &con.identifier, &con.expression);
+            markdown.push(rsx!(
+                div { "{message}" }
+            ));
+            constants.insert(con.identifier, con.expression);
+            continue;
+        }
 
-        components.register("Constant", |props| {
-            Ok(rsx! {
-                Constant {
-                    name: props.get_parsed("name").unwrap_or("Invalid".to_string()),
-                    value: props.get_parsed("value").unwrap_or("Invalid".to_string()),
-                }
-            })
-        });
+        let mut components = CustomComponents::new();
 
         components.register("Counter", move |props| {
             let value = props
@@ -71,13 +74,21 @@ pub(crate) fn Rollers(lines: Signal<String>) -> Element {
             })
         });
 
-        use_context_provider(|| Signal::new(Constants::default()));
+        let md = rsx!(Markdown {
+            src: line.clone(),
+            components,
+            preserve_html: false
+        });
+
         markdown.push(rsx!(
-            Markdown {
-                src: line.clone(),
-                components,
-                preserve_html: false
-            } // hard_line_breaks: true,
+            div {
+                ConstantsProvider {
+                    children: md,
+                    constants: Constants {
+                        values: constants.clone().into(),
+                    },
+                }
+            }
         ));
     }
 
@@ -91,13 +102,48 @@ pub(crate) fn Rollers(lines: Signal<String>) -> Element {
     )
 }
 
-#[derive(Default)]
-struct Constants {
-    values: HashMap<String, dicey::Result<Expression>>,
+#[component]
+fn ConstantsProvider(children: Element, constants: Constants) -> Element {
+    use_context_provider(|| constants);
+    children
 }
 
-pub fn try_roller(spec: &str) -> Option<String> {
-    let roller = Command::parse(spec);
+#[derive(Default, Clone)]
+struct Constants {
+    values: Rc<HashMap<String, Expression>>,
+}
+
+impl PartialEq for Constants {
+    fn eq(&self, other: &Self) -> bool {
+        Rc::ptr_eq(&self.values, &other.values)
+        //     if self.values.len() != other.values.len() {
+        //         return false;
+        //     }
+
+        //     for (k, v) in &self.values {
+        //         match other.values.get(k) {
+        //             Some(occupied_entry) => {
+        //                 match (occupied_entry, v) {
+        //                     (Ok(a), Ok(b)) => {
+        //                         if  a != b { return false; }
+        //                     },
+        //                     (Ok(_), Err(_)) => return false,
+        //                     (Err(_), Ok(_)) => return false,
+        //                     (Err(a), Err(b)) => {
+        //                         if a != b { return false; }
+        //                     },
+        //                 }
+        //             },
+        //             None =>  return false,
+        //         }
+        //     }
+
+        //     return true;
+    }
+}
+
+pub fn try_roller(spec: &str, constants: &HashMap<String, Expression>) -> Option<String> {
+    let roller = Command::parse_with_variables(spec, constants);
 
     match roller {
         Ok(_) => Some(spec.to_string()),
@@ -118,33 +164,13 @@ fn Counter(count: ReadWriteBox<i32>) -> Element {
     }
 }
 
-#[component]
-fn Constant(name: String, value: String) -> Element {
-    let mut state = use_context::<Signal<Constants>>();
-
-    let data = Expression::parse(&value);
-
-    state.write().values.insert(name.clone(), data.clone());
-
-    match data {
-        Ok(data) => rsx! {
-            span { "Constant: {name} = {data}" }
-        },
-        Err(error) => rsx! {
-            span {
-                "Invalid Constant: {name} = "
-                RollError { error, spec: value }
-            }
-        },
-    }
-}
-
 /**
  * Display text, or a roll button depending on if string is a valid roll specification (in dicey dice notation).
  */
 #[component]
 pub fn Roll(spec: String) -> Element {
-    match validate_roller(&spec) {
+    let constants = use_context::<Constants>();
+    match validate_roller(&spec, constants) {
         Ok(roller) => {
             rsx!(
                 Button {
@@ -165,8 +191,8 @@ pub fn Roll(spec: String) -> Element {
     }
 }
 
-fn validate_roller(spec: &str) -> Result<Command, Element> {
-    Command::parse(spec).map_err(|e| roll_error(e, spec))
+fn validate_roller(spec: &str, constants: Constants) -> Result<Command, Element> {
+    Command::parse_with_variables(spec, &constants.values).map_err(|e| roll_error(e, spec))
 }
 
 #[component]
@@ -192,7 +218,8 @@ fn get_dice_string(roll: &dyn EvaluatedExpression) -> String {
  */
 #[component]
 pub fn Attack(modifier: String, damage_dice: String, damage_fixed: String) -> Element {
-    let modifier_roller = match Expression::parse(&modifier) {
+    let constants = &use_context::<Constants>().values;
+    let modifier_roller = match Expression::parse_with_variables(&modifier, constants) {
         Ok(roller) => roller,
         Err(error) => {
             return rsx!(
@@ -204,7 +231,7 @@ pub fn Attack(modifier: String, damage_dice: String, damage_fixed: String) -> El
         }
     };
 
-    let damage_dice_roller = match Expression::parse(&damage_dice) {
+    let damage_dice_roller = match Expression::parse_with_variables(&damage_dice, constants) {
         Ok(roller) => roller,
         Err(error) => {
             return rsx!(
@@ -216,7 +243,7 @@ pub fn Attack(modifier: String, damage_dice: String, damage_fixed: String) -> El
         }
     };
 
-    let damage_fixed_roller = match Expression::parse(&damage_fixed) {
+    let damage_fixed_roller = match Expression::parse_with_variables(&damage_fixed, constants) {
         Ok(roller) => roller,
         Err(error) => {
             return rsx!(

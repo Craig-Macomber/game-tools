@@ -39,7 +39,7 @@ repeated_expr = { "(" ~ expr ~ ")" ~ "^" ~ (add | sort)? ~ number }
 
 // A reference to an externally provided variable
 variable = ${ "$" ~ variable_identifier }
-variable_identifier = @{ ( LETTER | NUMBER )+ }
+variable_identifier = @{ ( LETTER | NUMBER | "_" )+ }
 
 expr = { leaf ~ (op ~ leaf)* }
 leaf = _{ dice | float | integer | block_expr | variable }
