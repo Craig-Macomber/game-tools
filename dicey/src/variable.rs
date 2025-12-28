@@ -65,7 +65,7 @@ impl Variable {
 
 #[cfg(test)]
 mod tests {
-    use crate::{Rollable, Verbosity};
+    use crate::{Rollable, Verbosity, expression::FancyFormat};
 
     use super::*;
 

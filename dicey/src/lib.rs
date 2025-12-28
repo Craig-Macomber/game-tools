@@ -14,7 +14,7 @@ mod keep_or_drop;
 mod parser;
 mod variable;
 
-pub use expression::{EvaluatedExpression, Expression, Verbosity};
+pub use expression::{EvaluatedExpression, Expression, FancyFormat, Verbosity};
 
 pub use command::{Command, EvaluatedCommand};
 pub use variable::Variable;

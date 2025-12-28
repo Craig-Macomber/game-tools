@@ -11,7 +11,7 @@ license = "MIT"
 dioxus = { version = "0.7.0", features = [] }
 # dioxus-sdk = { version = "0.6.0", features = ["storage"] }
 dicey = { path = "../dicey" }
-# Disable default features to opt out of "math" since it is not supported on desktop builds
+# Disable default features to opt out of "math" since we `use preserve_html: false` which breaks it.
 dioxus-markdown = { git = "https://github.com/rambip/rust-web-markdown", rev = "1e9fb80e9cde417689a414963b168f6958e7b7bd", default-features = false }
 subslice-offset = "0.1.1"
 chrono = { version = "0.4", features = ["now", "wasmbind", "serde"] }

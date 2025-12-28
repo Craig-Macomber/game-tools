@@ -1,4 +1,4 @@
-use dicey::{Command, EvaluatedExpression, Expression, Rollable, Variable, Verbosity};
+use dicey::{Command, EvaluatedExpression, Expression, FancyFormat, Rollable, Variable, Verbosity};
 use dioxus::prelude::*;
 use dioxus_markdown::{CustomComponents, Markdown, ReadWriteBox};
 use subslice_offset::SubsliceOffset;
@@ -32,7 +32,7 @@ pub(crate) fn Rollers(lines: Signal<String>) -> Element {
         if let Ok(con) = Variable::parse(&line) {
             let message = format!("Constant: {} = {}", &con.identifier, &con.expression);
             markdown.push(rsx!(
-                div { "{message}" }
+                p { "{message}" }
             ));
             constants.insert(con.identifier, con.expression);
             continue;
@@ -43,7 +43,7 @@ pub(crate) fn Rollers(lines: Signal<String>) -> Element {
         components.register("Counter", move |props| {
             let value = props
                 .get_attribute("value")
-                .ok_or(rsx! { "Missing \"vale\" attribute." })?;
+                .ok_or(rsx! { "Missing \"value\" attribute." })?;
             let range = (value.range.start + offset - negative_offset)
                 ..(value.range.end + offset - negative_offset);
             let count = ReadWriteBox::from_sub_string(lines, range)?;
@@ -81,7 +81,7 @@ pub(crate) fn Rollers(lines: Signal<String>) -> Element {
         });
 
         markdown.push(rsx!(
-            div {
+            p {
                 ConstantsProvider {
                     children: md,
                     constants: Constants {
@@ -172,9 +172,10 @@ pub fn Roll(spec: String) -> Element {
     let constants = use_context::<Constants>();
     match validate_roller(&spec, constants) {
         Ok(roller) => {
+            let text = roller.format(false, Verbosity::Medium);
             rsx!(
                 Button {
-                    title: "{roller:?}",
+                    title: roller.format(false, Verbosity::Verbose),
                     onclick: move |_| {
                         let roll = roller.roll();
                         let message = match roll {
@@ -183,7 +184,7 @@ pub fn Roll(spec: String) -> Element {
                         };
                         LOG.write().log.push(LogItem::new(message));
                     },
-                    "{spec}"
+                    "{text}"
                 }
             )
         }
@@ -311,6 +312,16 @@ pub fn Attack(modifier: String, damage_dice: String, damage_fixed: String) -> El
         })
     }
 
+    let modifier_text = modifier_roller.format(false, Verbosity::Medium);
+    let damage_text = damage_dice_roller.format(false, Verbosity::Medium);
+    let damage_fixed_text = damage_fixed_roller.format(false, Verbosity::Medium);
+    let title = format!(
+        "1d20 + {} to hit for {} + {} damage",
+        modifier_roller.format(false, Verbosity::Verbose),
+        damage_dice_roller.format(false, Verbosity::Verbose),
+        damage_fixed_roller.format(false, Verbosity::Verbose)
+    );
+
     let modifier_roller_2 = modifier_roller.clone();
     let modifier_roller_3 = modifier_roller.clone();
     let damage_dice_roller_2 = damage_dice_roller.clone();
@@ -320,23 +331,27 @@ pub fn Attack(modifier: String, damage_dice: String, damage_fixed: String) -> El
     rsx!(
         span {
             Button {
+                title: disadvantage,
                 onclick: move |_| {
                     roll(disadvantage, &modifier_roller, &damage_dice_roller, &damage_fixed_roller);
                 },
                 b { "-" }
             }
             Button {
+                title,
                 onclick: move |_| {
                     roll(regular, &modifier_roller_2, &damage_dice_roller_2, &damage_fixed_roller_2);
                 },
                 span {
-                    b { "1d20 + {modifier}" }
+                    b { "1d20 + {modifier_text}" }
                     " to hit for "
-                    b { "{damage_dice} + {damage_fixed}" }
+                    b { "{damage_text} + {damage_fixed_text}" }
                     " damage"
                 }
+
             }
             Button {
+                title: advantage,
                 onclick: move |_| {
                     roll(
                         advantage,

@@ -2,7 +2,7 @@ use super::{EvaluatedExpression, Expression};
 use crate::{
     DiceRollSource, Result, Rollable, Verbosity,
     dice_expression::limit_dice,
-    expression::{format_bold, parse_expression},
+    expression::{FancyFormat, format_bold, parse_expression},
     parser::{RollParser, Rule},
 };
 use pest::{Parser, iterators::Pair};
@@ -45,7 +45,7 @@ pub struct Command {
 
 impl Display for Command {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.expression)
+        write!(f, "{}", self.format(false, Verbosity::Medium))
     }
 }
 
@@ -111,8 +111,15 @@ impl EvaluatedCommand {
         self.total
     }
 
+    /// Results from each run of the expression
+    pub fn results(&self) -> &Vec<Box<dyn EvaluatedExpression>> {
+        &self.expressions
+    }
+}
+
+impl FancyFormat for EvaluatedCommand {
     /// Pretty print the entire command results, including history and total (if appropriate).
-    pub fn format(&self, markdown: bool, verbose: Verbosity) -> String {
+    fn format(&self, markdown: bool, verbose: Verbosity) -> String {
         let inner: Vec<String> = self
             .expressions
             .iter()
@@ -141,11 +148,6 @@ impl EvaluatedCommand {
             Some(reason) => format!("{s} : {reason}"),
             None => s,
         }
-    }
-
-    /// Results from each run of the expression
-    pub fn results(&self) -> &Vec<Box<dyn EvaluatedExpression>> {
-        &self.expressions
     }
 }
 
@@ -178,6 +180,30 @@ impl Command {
             command.reason = Some(reason.as_str().trim().to_owned());
         }
         Ok(command)
+    }
+}
+
+impl FancyFormat for Command {
+    fn format(&self, markdown: bool, verbose: Verbosity) -> String {
+        let inner = self.expression.format(markdown, verbose);
+        let s = match &self.repeat {
+            Some(repeat) => format!("{} {}", inner, repeat),
+            None => inner,
+        };
+        match &self.reason {
+            Some(reason) => format!("{s} : {reason}"),
+            None => s,
+        }
+    }
+}
+
+impl Display for RepeatedCommand {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self.mode {
+            RepeatedMode::Sum => write!(f, "^+ {}", self.count),
+            RepeatedMode::Sort => write!(f, "^# {}", self.count),
+            RepeatedMode::None => write!(f, "^ {}", self.count),
+        }
     }
 }
 
@@ -377,15 +403,21 @@ mod tests {
     }
 
     #[test]
+    fn formatted_expression() {
+        let f = Expression::parse("5").unwrap();
+        assert_eq!(f.format(false, Verbosity::Verbose), "5");
+    }
+
+    #[test]
     fn variable() {
         let mut vars: HashMap<String, Expression, _> = HashMap::default();
         vars.insert("Var".to_string(), Expression::parse("5").unwrap());
         let minimal = Expression::parse_with_variables("$Var", &vars).unwrap();
-        assert_eq!(format!("{minimal}"), "($Var: 5)");
+        assert_eq!(minimal.format(false, Verbosity::Medium), "5");
         assert_eq!(minimal.roll().unwrap().total(), 5.0);
 
         let mixed = Expression::parse_with_variables("1 + $Var", &vars).unwrap();
-        assert_eq!(format!("{mixed}"), "1 + ($Var: 5)");
+        assert_eq!(mixed.format(true, Verbosity::Verbose), "1 + ($Var: 5)");
         assert_eq!(mixed.roll().unwrap().total(), 6.0);
     }
 }

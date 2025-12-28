@@ -19,13 +19,19 @@ pub struct Expression(Rc<dyn ExpressionRollable>);
 
 impl Display for Expression {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        std::fmt::Display::fmt(&*self.0, f)
+        write!(f, "{}", self.format(false, Verbosity::Medium))
+    }
+}
+
+impl FancyFormat for Expression {
+    fn format(&self, markdown: bool, verbose: Verbosity) -> String {
+        self.0.format(markdown, verbose)
     }
 }
 
 pub type ExpressionResult = Result<Box<dyn EvaluatedExpression>>;
 
-pub(crate) trait ExpressionRollable: Debug + Display {
+pub(crate) trait ExpressionRollable: Debug + FancyFormat {
     /// Evaluate and roll the dice with provided dice roll source
     fn expression_roll(&self, rng: &mut dyn DiceRollSource) -> ExpressionResult;
 }
@@ -63,7 +69,21 @@ impl BinaryOp {
         }
     }
 
-    fn format<T: Display>(&self, left: T, right: T, markdown: bool) -> String {
+    fn format<T: FancyFormat>(
+        &self,
+        left: &T,
+        right: &T,
+        markdown: bool,
+        verbose: Verbosity,
+    ) -> String {
+        self.format_strings(
+            &left.format(markdown, verbose),
+            &right.format(markdown, verbose),
+            markdown,
+        )
+    }
+
+    fn format_strings(&self, left: &str, right: &str, markdown: bool) -> String {
         format!(
             "{left}{}{right}",
             match self {
@@ -88,9 +108,9 @@ struct BinaryExpression<T> {
     right: T,
 }
 
-impl Display for BinaryExpression<Expression> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.op.format(&self.left, &self.right, false))
+impl<T: FancyFormat> FancyFormat for BinaryExpression<T> {
+    fn format(&self, markdown: bool, verbose: Verbosity) -> String {
+        self.op.format(&self.left, &self.right, markdown, verbose)
     }
 }
 
@@ -112,9 +132,9 @@ impl EvaluatedExpression for BinaryExpression<Box<dyn EvaluatedExpression>> {
     }
 
     fn format_history(&self, markdown: bool, verbose: Verbosity) -> String {
-        self.op.format(
-            self.left.format_history(markdown, verbose),
-            self.right.format_history(markdown, verbose),
+        self.op.format_strings(
+            &self.left.format_history(markdown, verbose),
+            &self.right.format_history(markdown, verbose),
             markdown,
         )
     }
@@ -126,44 +146,43 @@ struct RollableFloat(f64);
 
 impl ExpressionRollable for RollableFloat {
     fn expression_roll(&self, _rng: &mut dyn DiceRollSource) -> ExpressionResult {
-        Ok(Box::new(self.clone()))
+        Ok(Box::new(RollabledNumber(self.0)))
     }
 }
 
-impl Display for RollableFloat {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+#[derive(Debug, Clone)]
+struct RollabledNumber(f64);
+
+impl FancyFormat for RollableFloat {
+    fn format(&self, _markdown: bool, _verbose: Verbosity) -> String {
         if self.0.fract() == 0.0 {
             // Include ".0" at the end of integer values so if they round trip, its clear they are a float not an int.
-            write!(f, "{:.1}", self.0)
+            format!("{:.1}", self.0)
         } else {
-            write!(f, "{:.}", self.0)
+            format!("{:.}", self.0)
         }
     }
 }
 
-impl EvaluatedExpression for RollableFloat {
+impl EvaluatedExpression for RollabledNumber {
     fn total(&self) -> f64 {
         self.0
     }
 
     fn format_history(&self, _markdown: bool, _verbose: Verbosity) -> String {
-        format!("{self}")
+        format!("{}", self.0)
     }
 }
 
 impl ExpressionRollable for i64 {
     fn expression_roll(&self, _rng: &mut dyn DiceRollSource) -> ExpressionResult {
-        Ok(Box::new(*self))
+        Ok(Box::new(RollabledNumber(*self as f64)))
     }
 }
 
-impl EvaluatedExpression for i64 {
-    fn total(&self) -> f64 {
-        *self as f64
-    }
-
-    fn format_history(&self, _markdown: bool, _verbose: Verbosity) -> String {
-        format!("{self}")
+impl FancyFormat for i64 {
+    fn format(&self, _markdown: bool, _verbose: Verbosity) -> String {
+        format!("{}", self)
     }
 }
 
@@ -172,10 +191,10 @@ struct BlockExpression<T> {
     inner: T,
 }
 
-impl Display for BlockExpression<Expression> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl FancyFormat for BlockExpression<Expression> {
+    fn format(&self, markdown: bool, verbose: Verbosity) -> String {
         let inner = &*self.inner.0;
-        write!(f, "({})", inner)
+        format!("({})", inner.format(markdown, verbose))
     }
 }
 
@@ -218,10 +237,18 @@ impl ExpressionRollable for VariableReference {
     }
 }
 
-impl Display for VariableReference {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let inner = &*self.inner.0;
-        write!(f, "(${}: {})", self.identifier, inner)
+impl FancyFormat for VariableReference {
+    fn format(&self, markdown: bool, verbose: Verbosity) -> String {
+        let inner = self.inner.format(markdown, verbose);
+        if verbose == Verbosity::Verbose {
+            format!(
+                "(${}: {})",
+                self.identifier,
+                self.inner.format(markdown, verbose)
+            )
+        } else {
+            inner
+        }
     }
 }
 
@@ -243,6 +270,12 @@ impl EvaluatedExpression for VariableReferenceRolled<Box<dyn EvaluatedExpression
     }
 }
 
+/// Formatter with adjustable verbosity and support for markdown.
+pub trait FancyFormat {
+    /// Format history and total into one string.
+    fn format(&self, markdown: bool, verbose: Verbosity) -> String;
+}
+
 /// Result of evaluating an [Expression].
 pub trait EvaluatedExpression: Debug {
     /// Numeric result.
@@ -251,7 +284,9 @@ pub trait EvaluatedExpression: Debug {
 
     /// Pretty print the rolls and adjustments to them which produced the result.
     fn format_history(&self, markdown: bool, verbose: Verbosity) -> String;
+}
 
+impl<T: EvaluatedExpression + ?Sized> FancyFormat for T {
     /// Format history and total into one string.
     fn format(&self, markdown: bool, verbose: Verbosity) -> String {
         let history = self.format_history(markdown, verbose);

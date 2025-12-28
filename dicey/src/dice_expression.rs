@@ -12,7 +12,8 @@ use crate::{
     DiceRollSource, Result, RollError, Rollable,
     dice_kind::{DiceKind, Roll, basic::BasicDice, fudge::Fudge},
     expression::{
-        EvaluatedExpression, Expression, ExpressionResult, ExpressionRollable, Verbosity,
+        EvaluatedExpression, Expression, ExpressionResult, ExpressionRollable, FancyFormat,
+        Verbosity,
     },
     keep_or_drop::KeepOrDrop,
     parser::Rule,
@@ -318,8 +319,8 @@ struct RollSpec<Dice: DiceKind> {
     aggregator: Aggregator<Dice::Roll>,
 }
 
-impl<Dice: DiceKind> Display for RollSpec<Dice> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl<Dice: DiceKind> FancyFormat for RollSpec<Dice> {
+    fn format(&self, _markdown: bool, _verbose: Verbosity) -> String {
         let modifiers = self
             .modifiers
             .iter()
@@ -356,8 +357,7 @@ impl<Dice: DiceKind> Display for RollSpec<Dice> {
             }
             Aggregator::Sum => "".to_string(),
         };
-        write!(
-            f,
+        format!(
             "{}d{}{modifiers}{aggregator}",
             self.number_of_dice, self.dice,
         )
