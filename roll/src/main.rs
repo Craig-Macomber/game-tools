@@ -125,14 +125,10 @@ Health: <Counter value="20"/>
 
 # Constants
 
-$attack_bonus = 5
-$damage_bonus = 1d6
-
-<A m="$attack_bonus" d="$damage_bonus" f="2"/>
-<A m="$attack_bonus" d="2d6 + $damage_bonus" f="2"/>
-<A m="$attack_bonus" d="1d4 + $damage_bonus" f="2"/>
-
-
+$proficiency = 3
+$strength_bonus = 2
+$attack_bonus = $strength_bonus + $proficiency
+<A m="$attack_bonus" d="2d6" f="$strength_bonus"/>
 "#;
 
 #[cfg(target_arch = "wasm32")]

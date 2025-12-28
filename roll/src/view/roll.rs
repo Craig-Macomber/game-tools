@@ -29,7 +29,7 @@ pub(crate) fn Rollers(lines: Signal<String>) -> Element {
             None => (line.to_string(), 0),
         };
 
-        if let Ok(con) = Variable::parse(&line) {
+        if let Ok(con) = Variable::parse_with_variables(&line, &constants) {
             let message = format!("Constant: {} = {}", &con.identifier, &con.expression);
             markdown.push(rsx!(
                 p { "{message}" }

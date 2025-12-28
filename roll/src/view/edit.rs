@@ -115,7 +115,7 @@ fn Syntax(state: Signal<State>) -> Element {
                     }
                 }
                 AccordionContent {
-                    span {
+                    div {
                         a { href: "https://commonmark.org/help/", "Markdown" }
                         " with "
                         a { href: "https://github.com/Craig-Macomber/game-tools/blob/main/dicey/README.md#syntax",
@@ -123,7 +123,7 @@ fn Syntax(state: Signal<State>) -> Element {
                         }
                         "."
                     }
-                    span {
+                    div {
                         "Dice notation can be on its own line or in a "
                         i { style: "white-space: nowrap;", "<Roll d=\"dice here\"/>" }
                         " tag."
@@ -146,6 +146,26 @@ fn Syntax(state: Signal<State>) -> Element {
                     span {
                         "Attack: "
                         i { style: "white-space: nowrap;", r#"<A m="5" d="2d6 + 1d8" f="2"/>"# }
+                    }
+                }
+            }
+            AccordionItem { index: 3,
+                AccordionTrigger {
+                    h3 { "Constants" }
+                }
+                AccordionContent {
+                    div {
+                        "Constants can be declared on their own line like:"
+                        i { style: "white-space: nowrap;",
+                            div { "$attack_bonus = 5" }
+                        }
+                        "Constants can be set to any dice expression, and can be used in dice expressions. For example: "
+                        i { style: "white-space: nowrap;",
+                            div { "$proficiency = 3" }
+                            div { "$strength_bonus = 2" }
+                            div { "$attack_bonus = $strength_bonus + $proficiency" }
+                            div { r#"<A m="$attack_bonus" d="2d6" f="$strength_bonus"/>"# }
+                        }
                     }
                 }
             }
