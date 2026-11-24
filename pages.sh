@@ -23,10 +23,6 @@ cargo test
 # Build for web
 dx bundle --package roll --release
 
-# Regenerate the pages branch from the current one
-git branch -D pages
-git checkout -b pages
-
 # Get the BUILD_DIR and check it exists
 BUILD_DIR=./target/dx/roll/release/web/public
 if [ ! -d "$BUILD_DIR" ]; then
@@ -37,8 +33,12 @@ fi
 # Copy build to location expected by github pages:
 cp -r "$BUILD_DIR"/* ./docs
 
-
+# Populate license.html
 cargo about generate about.hbs > docs/license.html
+
+# Regenerate the pages branch from the current one
+git branch -D pages
+git checkout -b pages
 
 git add -f ./docs
 
