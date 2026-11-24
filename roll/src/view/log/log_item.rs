@@ -4,8 +4,6 @@ use dioxus_markdown::Markdown;
 
 use crate::{LogItem, view::dioxus_time::observe_time};
 
-use std::vec;
-
 use super::super::time_observer::TimeObserver;
 
 /**
