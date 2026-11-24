@@ -117,7 +117,7 @@ fn Syntax(state: Signal<State>) -> Element {
                 AccordionContent {
                     div {
                         a { href: "https://commonmark.org/help/", "Markdown" }
-                        " with "
+                        " (no tables) with "
                         a { href: "https://github.com/Craig-Macomber/game-tools/blob/main/dicey/README.md#syntax",
                             "Dicey dice notation"
                         }
@@ -138,14 +138,17 @@ fn Syntax(state: Signal<State>) -> Element {
                     span {
                         "Roll: "
                         i { style: "white-space: nowrap;", "<Roll d=\"dice here\"/>" }
+                        " or "
+                        i { style: "white-space: nowrap;", "<R d=\"dice here\"/>" }
                     }
                     span {
                         "Counter: "
-                        i { style: "white-space: nowrap;", "<Counter initial=\"20\"/>" }
+                        i { style: "white-space: nowrap;", "<Counter value=\"20\"/>" }
                     }
                     span {
                         "Attack: "
                         i { style: "white-space: nowrap;", r#"<A m="5" d="2d6 + 1d8" f="2"/>"# }
+                            " (m = attack bonus added to d20 roll; d = dice expression for damage, doubles for crits; f = fixed componet not impacted by crits, added to damage)"
                     }
                 }
             }
