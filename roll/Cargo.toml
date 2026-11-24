@@ -8,7 +8,7 @@ license = "MIT"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-dioxus = { version = "0.7.0", features = [] }
+dioxus = { version = "=0.7.9", features = [] }
 # dioxus-sdk = { version = "0.6.0", features = ["storage"] }
 dicey = { path = "../dicey" }
 # Disable default features to opt out of "math" since we `use preserve_html: false` which breaks it.
@@ -32,7 +32,7 @@ web-sys = { version = "0.3.76", features = [
     "Window",
 ] }
 js-sys = { version = "0.3.76" }
-wasm-bindgen = { version = "0.2" }
+wasm-bindgen = { version = "=0.2.118" }
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 
