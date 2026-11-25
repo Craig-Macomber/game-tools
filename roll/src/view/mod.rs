@@ -9,6 +9,7 @@ pub mod dioxus_time;
 mod edit;
 mod log;
 mod roll;
+pub mod tags;
 pub mod time_observer;
 
 #[component]

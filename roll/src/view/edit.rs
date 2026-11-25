@@ -2,6 +2,7 @@ use std::borrow::BorrowMut;
 
 use crate::components::button::*;
 use crate::components::textarea::Textarea;
+use crate::view::tags::TAG_KINDS;
 use crate::{State, components::accordion::*, save_url};
 use dioxus::prelude::*;
 
@@ -135,21 +136,7 @@ fn Syntax(state: Signal<State>) -> Element {
                     h3 { "Tags" }
                 }
                 AccordionContent {
-                    span {
-                        "Roll: "
-                        i { style: "white-space: nowrap;", "<Roll d=\"dice here\"/>" }
-                        " or "
-                        i { style: "white-space: nowrap;", "<R d=\"dice here\"/>" }
-                    }
-                    span {
-                        "Counter: "
-                        i { style: "white-space: nowrap;", "<Counter value=\"20\"/>" }
-                    }
-                    span {
-                        "Attack: "
-                        i { style: "white-space: nowrap;", r#"<A m="5" d="2d6 + 1d8" f="2"/>"# }
-                            " (m = attack bonus added to d20 roll; d = dice expression for damage, doubles for crits; f = fixed componet not impacted by crits, added to damage)"
-                    }
+                    TagDocs { }
                 }
             }
             AccordionItem { index: 3,
@@ -170,6 +157,25 @@ fn Syntax(state: Signal<State>) -> Element {
                             div { r#"<A m="$attack_bonus" d="2d6" f="$strength_bonus"/>"# }
                         }
                     }
+                }
+            }
+        }
+    }
+}
+
+#[component]
+pub(crate) fn TagDocs() -> Element {
+    rsx! {
+        for tag in TAG_KINDS.iter() {
+            span {
+                "{tag.tag}"
+                if let Some(short) = tag.short_tag {
+                    " (\"{tag.tag}\" or \"{short}\")"
+                }
+                ": "
+                i { style: "white-space: nowrap;", "{tag.example}" }
+                if let Some(description) = tag.description {
+                    " ({description})"
                 }
             }
         }
