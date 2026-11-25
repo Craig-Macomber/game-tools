@@ -27,7 +27,7 @@ pub const TAG: TagKindData = TagKindData {
 #[component]
 pub fn Roll(spec: String) -> Element {
     let constants = use_context::<Constants>();
-    match validate_roller(&spec, constants) {
+    match validate_roller(&spec, &constants) {
         Ok(roller) => {
             let text = roller.format(false, Verbosity::Medium);
             rsx!(
@@ -49,7 +49,7 @@ pub fn Roll(spec: String) -> Element {
     }
 }
 
-fn validate_roller(spec: &str, constants: Constants) -> Result<Command, Element> {
+fn validate_roller(spec: &str, constants: &Constants) -> Result<Command, Element> {
     Command::parse_with_variables(spec, &constants.values).map_err(|e| roll_error(e, spec))
 }
 

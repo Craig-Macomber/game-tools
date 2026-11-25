@@ -4699,6 +4699,7 @@ dependencies = [
  "serde_json",
  "subslice-offset",
  "wasm-bindgen",
+ "web-framework-markdown",
  "web-sys",
 ]
 

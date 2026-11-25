@@ -9,10 +9,7 @@ use pest::{Parser, iterators::Pair};
 use std::{collections::HashMap, fmt::Display};
 
 /// Parse a single (non-repeated) dice expression.
-pub(crate) fn parse_single_command(
-    s: &str,
-    variables: &HashMap<String, Expression>,
-) -> Result<Command> {
+fn parse_single_command(s: &str, variables: &HashMap<String, Expression>) -> Result<Command> {
     let mut pairs = RollParser::parse(Rule::single_command, s)?;
     let expr_type = pairs.next().unwrap();
     assert_eq!(expr_type.as_rule(), Rule::expr);

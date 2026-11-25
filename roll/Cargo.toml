@@ -20,6 +20,7 @@ async-std = { version = "1.13" }
 serde_json = "1.0.140"
 serde = "1.0.219"
 dioxus-primitives = { git = "https://github.com/DioxusLabs/components", version = "0.0.1", default-features = false }
+web-framework-markdown = { git = "https://github.com/rambip/rust-web-markdown", rev = "1e9fb80e9cde417689a414963b168f6958e7b7bd", default-features = false }
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 # dicey pulls in "getrandom" which needs custom features to support WASM:
