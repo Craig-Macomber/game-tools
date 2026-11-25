@@ -1,9 +1,9 @@
-use dicey::Variable;
+use dicey::{Command, Expression, Variable};
 use dioxus::prelude::*;
 use dioxus_markdown::{CustomComponents, Markdown};
 use subslice_offset::SubsliceOffset;
 
-use crate::view::tags::{Constants, TAG_KINDS, try_roller};
+use crate::view::tags::{Constants, TAG_KINDS};
 
 use std::collections::HashMap;
 use std::vec;
@@ -86,4 +86,13 @@ pub(crate) fn Rollers(lines: Signal<String>) -> Element {
 fn ConstantsProvider(children: Element, constants: Constants) -> Element {
     use_context_provider(|| constants);
     children
+}
+
+pub fn try_roller(spec: &str, constants: &HashMap<String, Expression>) -> Option<String> {
+    let roller = Command::parse_with_variables(spec, constants);
+
+    match roller {
+        Ok(_) => Some(spec.to_string()),
+        Err(_) => None,
+    }
 }
