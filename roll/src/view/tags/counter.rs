@@ -10,8 +10,6 @@ use crate::view::log::LOG;
 use crate::view::tags::roll::roll_error;
 use crate::view::tags::{Constants, TagKindData};
 
-use std::vec;
-
 pub const TAG: TagKindData = TagKindData {
     tag: "Counter",
     short_tag: None,

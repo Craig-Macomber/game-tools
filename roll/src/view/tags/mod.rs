@@ -6,6 +6,7 @@ use std::collections::HashMap;
 use std::rc::Rc;
 
 mod attack;
+mod checkbox;
 mod counter;
 mod roll;
 
@@ -24,7 +25,8 @@ pub(crate) struct TagKindData {
     pub component: ComponentFactory,
 }
 
-pub const TAG_KINDS: &'static [TagKindData] = &[roll::TAG, counter::TAG, attack::TAG];
+pub const TAG_KINDS: &'static [TagKindData] =
+    &[roll::TAG, counter::TAG, attack::TAG, checkbox::TAG];
 
 #[derive(Default, Clone)]
 pub struct Constants {

@@ -121,7 +121,13 @@ static DEFAULT_TEXT: &str = r#"# Examples:
 <A m="5" d="2d6 + 1d8" f="2"/>
 
 ## Counter:
-Health: <Counter value="20"/>
+Health: <Counter value="17" default="2d10+10"/>
+Level 1 Spells: <Counter value="4" default="4"/>
+Exhaustion: <Counter value="0" />
+
+## Checkbox
+Inspiration: <Checkbox value="true"/>
+Restrained: <Checkbox value="false"/>
 
 # Constants
 
@@ -129,6 +135,8 @@ $proficiency = 3
 $strength_bonus = 2
 $attack_bonus = $strength_bonus + $proficiency
 <A m="$attack_bonus" d="2d6" f="$strength_bonus"/>
+Skill: <R d="1d20 + $proficiency + $strength_bonus"/> // TODO: the markdown rendering of roll results for this parses it as "maths"
+
 "#;
 
 #[cfg(target_arch = "wasm32")]
